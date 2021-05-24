@@ -1,0 +1,62 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="_layout.master.cs" Inherits="Master_Page_Admin_Layout_AdminLayout" %>
+
+
+
+
+<%@ Register Src="./layouts/TopNavbar.ascx" TagPrefix="uc1" TagName="TopNavbar" %>
+
+<%@ Register Src="./layouts/RequiredScripts.ascx" TagPrefix="uc1" TagName="RequiredScripts" %>
+<%@ Register Src="./layouts/LeftSideBar.ascx" TagPrefix="uc1" TagName="LeftSideBar" %>
+<%@ Register Src="~/master/layouts/Header.ascx" TagPrefix="uc1" TagName="Header" %>
+
+
+
+
+<!DOCTYPE html>
+<!--
+This is a starter template page. Use this page to start your new project from
+scratch. This page gets rid of all links and provides the needed markup only.
+-->
+<html lang="en">
+<head>
+<uc1:Header runat="server" ID="Header1" />
+  <asp:ContentPlaceHolder id="AdditionalCSS" runat="server">
+
+  </asp:ContentPlaceHolder>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed ">
+    <%--class：【sidebar-collapse】--%>
+
+  <div class="wrapper">
+    <!-- Navbar -->
+    <uc1:TopNavbar runat="server" ID="TopNavbar" />
+    <!-- /.navbar -->
+    <!-- Main Sidebar Container -->
+    <uc1:LeftSidebar runat="server" id="LeftSidebar" />
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <asp:ContentPlaceHolder id="Header" runat="server">
+      </asp:ContentPlaceHolder>
+      <!-- /.content-header -->
+      <!-- Main content -->
+      <asp:ContentPlaceHolder id="Content" runat="server">
+      </asp:ContentPlaceHolder>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <!-- Control Sidebar -->
+
+  </div>
+  <!-- ./wrapper -->
+  <!-- REQUIRED SCRIPTS -->
+  <uc1:RequiredScripts runat="server" ID="RequiredScripts1" />
+
+  <asp:ContentPlaceHolder id="AdditionalJS" runat="server">
+
+  </asp:ContentPlaceHolder>
+
+
+
+</body>
+</html>
