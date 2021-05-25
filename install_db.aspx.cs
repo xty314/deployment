@@ -20,6 +20,7 @@ public partial class install_db : System.Web.UI.Page
             CreateNewDatabase();
         }
         LoadDatabaseList();
+        
     }
 
     private void CreateNewDatabase()

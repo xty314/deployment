@@ -677,4 +677,27 @@ public class DBhelper
         }
 
     }
+    public void RunScript(int id)
+    {
+        DBhelper dbhelper = new DBhelper();
+        //SqlParameter[] sp = { new SqlParameter("@id", id) };
+        //string sqlString = (string)ExecuteScalar(sc, sp);
+        //this.DBhelperConnection = new SqlConnection(sqlString);
+        string sc = "select fileName from script where id=" + id;
+        string filePath = (string)dbhelper.ExecuteScalar(sc);
+        string content = System.IO.File.ReadAllText(filePath);
+        ExecuteNonQuery(content);
+        // execute all .sql files under the sql folder.
+        //System.IO.DirectoryInfo sqlDir = new System.IO.DirectoryInfo(HttpContext.Current.Server.MapPath("~/script/"));
+        //System.IO.FileInfo[] sqlFiles = sqlDir.GetFiles();
+        //for (int i = 0; i < sqlFiles.Length; i++)
+        //{
+        //    string type = sqlFiles[i].FullName.Substring(sqlFiles[i].FullName.LastIndexOf(".") + 1).ToLower();
+        //    if (type == "sql")
+        //    {
+               
+        //    }
+
+        //}
+    }
 }

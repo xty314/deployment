@@ -65,7 +65,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="./index2.html" class="nav-link">
+                            <a href="/script.aspx" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Script</p>
                             </a>
