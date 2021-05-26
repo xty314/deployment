@@ -6,7 +6,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-public partial class setting : System.Web.UI.Page
+public partial class setting : AdminBasePage
 {
     public DataTable settingDataTable;
     DBhelper dbhelper = new DBhelper();

@@ -8,7 +8,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-public partial class database : System.Web.UI.Page
+public partial class database : AdminBasePage
 {
     public DBhelper dbhelper = new DBhelper();
     public DataTable dbDataTable = new DataTable();
@@ -52,6 +52,10 @@ public partial class database : System.Web.UI.Page
                 DBhelper masterHelper = new DBhelper("master");
                 sc = String.Format("RESTORE DATABASE {0} FROM DISK = '{1}' WITH REPLACE", companyFolderAndDbName, databasePath);
                 masterHelper.ExecuteNonQuery(sc);
+
+
+
+
             }
             catch (Exception e)
             {
@@ -67,6 +71,10 @@ public partial class database : System.Web.UI.Page
                     (@TradingName,@DbConnectionString,@creator,@install_db_id)";
         string newId = dbhelper.GetNextId("db_list").ToString();
         string newDbConnection = "Server=" + server + ";Database=" + companyFolderAndDbName + ";User Id=eznz;password=9seqxtf7";
+
+
+
+
         SqlParameter[] parameters =
         {
            new SqlParameter("@TradingName", company),
@@ -77,6 +85,21 @@ public partial class database : System.Web.UI.Page
         };
         try
         {
+            //没有script表时将在新数据库中创建script table，该表用于记录所有运行脚本的信息
+            DBhelper newdbHelper = new DBhelper(newDbConnection);
+            if (!newdbHelper.IsExistTable("script"))
+            {
+                string createScriptTable = @"CREATE TABLE [dbo].[script](
+	                                        [id] [int] NULL,
+	                                        [name] [nvarchar](50) NULL,
+	                                        [uploader] [int] NULL,
+	                                        [upload_date] [datetime] NULL,
+	                                        [description] [ntext] NOT NULL,
+	                                        [location] [nvarchar](max) NULL
+                                        ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]";
+                newdbHelper.ExecuteNonQuery(createScriptTable);
+            }
+          
             dbhelper.ExecuteNonQuery(sc, parameters);
         }
         catch (Exception e)

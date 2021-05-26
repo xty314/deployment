@@ -8,10 +8,7 @@
 
 <%@Import Namespace="System.Data.SqlClient" %>
 <%@Import Namespace ="System.Data" %>
-<asp:Content ContentPlaceHolderId="AdditionalCSS" runat="server">
 
-
-</asp:Content>
 
 <asp:Content ContentPlaceHolderId="Header" runat="server">
   <section class="content-header">
@@ -22,8 +19,10 @@
           </div>
          <div class="col-sm-6">
                     <div class="float-right">
-                        <button class="btn bg-blue" data-toggle="modal" data-target="#NewModal"><i
-                                class="fa fa-pen"></i>Upload Script</button>
+                         <button class="btn bg-blue" data-toggle="modal" data-target="#NewModal"><i
+                                class="fa fa-pen"></i> Create Script</button>
+                        <button class="btn bg-blue" data-toggle="modal" data-target="#UploadModal"><i
+                                class="fa fa-file"></i> Upload Script</button>
                          <%--<button class="btn bg-blue" data-toggle="modal" data-target="#NewCompanyModal"><i
                                 class="fa fa-pen"></i>Update </button>--%>
                         <%-- <button type="button" class="btn btn-success"><i class="fa fa-download"></i>Export </button>--%>
@@ -47,10 +46,11 @@
                         </div>
                     </div>
         <%} %>
-      <!-- Default box -->
-      <div class="card">
+        <div class="row">
+         <div class="col-md-6">
+              <div class="card">
         <div class="card-header">
-          <h3 class="card-title">Projects</h3>
+          <h3 class="card-title"><%=DBName%>s</h3>
 
           <div class="card-tools">
             <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
@@ -69,41 +69,40 @@
                                 #id
                             </th>
                             <th style="width: 15%">
-                                DB Name
+                               Name
                             </th>
-                            <th style="width: 20%">
-                                 MReport URL
+                  
+                            <th class="text-center" >
+                               Description
                             </th>
-                            <th class="text-center" style="width: 40%">
-                                API
+                              <th class="text-center" >
+                              Upload Date
                             </th>
-
                             <th style="width: 20%" class="text-right">
                                 Action
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        <%foreach (DataRow dr in dbDataTable.Rows)
+                        <%foreach (DataRow dr in scriptDataTable.Rows)
                             {%>
                          <tr>
                             <td>
                                 #<%=dr["id"]%>
                             </td>
                             <td>
-                                <a>
+                                <a href="script.aspx?id=<%=dr["id"]%>">
                                     <%=dr["name"] %>
                                 </a>
                                
                             </td>
-                            <td>
-              <%--                <a href="<%="http://" + Request.Url.Host+"/m/" + dr["ReportDir"]+"/index.aspx"%>"
-                                    target="_blank"><%="http://" + Request.Url.Host+"/m/" + dr["ReportDir"]+"/index.aspx"%> </a>--%>
-                            </td>
+         
                             <td class="project_progress  text-center">
-                                               
+                                     <%=dr["description"] %>          
                             </td>
-
+                                 <td class="project_progress  text-center">
+                                     <%=dr["upload_date"] %>          
+                            </td>
                             <td class="project-actions text-right">
                             
                             <div class="btn-group">
@@ -112,38 +111,14 @@
                       Action
                     </button>
                     <div class="dropdown-menu" role="menu">
-                      <a class="dropdown-item" href="./user.aspx?id=<%=dr["id"]%>"><i class="fas fa-user"></i>Update Bak</a>
+                      <a class="dropdown-item" data-toggle="modal" data-target="#EditModal" href="./user.aspx?id=<%=dr["id"]%>"><i class="fas fa-pencil-alt"></i> EDIT</a>
                    
                       <div class="dropdown-divider"></div>
-                         <a class="dropdown-item" href="./branch.aspx?id=<%=dr["id"]%>"><i class="fas fa-building"></i>Run Script</a>
+                         <a class="dropdown-item" data-toggle="modal" data-target="#EditModal" href="./branch.aspx?id=<%=dr["id"]%>"><i class="fas fa-trash"></i> Delete</a>
 
                     </div>
                   </div>
-                                <a class="btn btn-info btn-sm edit-btn" href="#" 
-                                        data-toggle="modal" data-target="#EditModal"
-                                         data-id=<%=dr["id"]%>
-                                        data-company="<%=dr["name"] %>"
-                                        data-database="<%=Common.GetDatabase(dr["conn_str"].ToString()) %>"
-                                        data-server="<%=Common.GetServer(dr["conn_str"].ToString()) %>"
-                                     
-               
-                                        >
-                                    <i class="fas fa-pencil-alt">
-                                    </i>
-                                   EDIT
-                                </a>
-                                <%if ((bool)dr["removable"]){ %>
-                                  <a class="btn btn-danger btn-sm delete-btn" href="#" 
-                                        data-toggle="modal" data-target="#DeleteModal"
-                                       data-company="<%=dr["name"] %>"
-                                       data-id=<%=dr["id"]%>
                      
-                                      >
-                                    <i class="fas fa-trash">
-                                    </i>
-                                   DELETE
-                                </a>
-                                <%} %>
                             </td>
                         </tr>
                         <%} %>
@@ -154,11 +129,74 @@
         </div>
         <!-- /.card-body -->
       </div>
+         </div>
+            <%if (!String.IsNullOrEmpty(Request.QueryString["id"]) && Common.IsNumberic(Request.QueryString["id"])){ %>
+           <div class="col-md-6">
+               <form method="post">
+          <div class="card card-outline card-info">
+            <div class="card-header">
+              <h3 class="card-title">
+               <%=ScriptName(Request.QueryString["id"]) %>
+              </h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body p-0">
+              <textarea class="codeMirror" name="content" class="p-3">
+                <%=ScriptContent(Request.QueryString["id"]) %>
+              </textarea>
+            </div>
+     <div class="card-footer">
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+          </div>
+                   </form>
+        </div>
+        <%} %>
+            <!-- /.col-->
+             
+      </div>
+      <!-- Default box -->
+    
       <!-- /.card -->
 
     </section>
      <form  method="post" id='NewForm' enctype="multipart/form-data">
-        <div class="modal fade" id="NewModal" tabindex="-1" role="dialog" 
+        <div class="modal fade" id="NewModal" tabindex="-1" role="dialog"     aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Create Script</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body"  >
+                           <div class="form-group">
+                        <label class="col-form-label col-sm-4">Sql Script：</label>
+                     <textarea class="codeMirror p-3"  style="height:300px" name="content" ></textarea>
+
+                      </div>
+                         
+                           <div class="form-group row">
+                            <label for="recipient-name" class="col-form-label col-sm-4">Name:</label>
+                            <input type="text" class="form-control  col-sm-8" id="scriptName" name='name'>
+                        </div>
+                       
+                     <div class="form-group row">
+                        <label class="col-form-label col-sm-4">Description</label>
+                        <textarea class="form-control col-sm-8" rows="3" name ="description" placeholder="Description ..." style="margin-top: 0px; margin-bottom: 0px; height: 105px;"></textarea>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" name='cmd' value='new' class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+         <form  method="post" id='UploadForm' enctype="multipart/form-data">
+        <div class="modal fade" id="UploadModal" tabindex="-1" role="dialog" 
             aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -194,7 +232,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" name='cmd' value='new' class="btn btn-primary">Save</button>
+                        <button type="submit" name='cmd' value='upload' class="btn btn-primary">Save</button>
                     </div>
                 </div>
             </div>
@@ -285,8 +323,23 @@
     </form>
  <!-- /.content -->
 </asp:Content>
+
+<asp:Content ContentPlaceHolderId="AdditionalCSS" runat="server">
+   
+    <link href="src/plugins/codemirror/codemirror.css" rel="stylesheet" />
+     <link href="src/plugins/codemirror/theme/monokai.css" rel="stylesheet" />
+<%--    <style>
+        .CodeMirror {
+  border: 1px solid #eee;
+  height: auto;
+}
+    </style>--%>
+</asp:Content>
 <asp:Content ContentPlaceHolderId="AdditionalJS" runat="server">
     <script src="src/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+ 
+    <script src="src/plugins/codemirror/codemirror.js"></script>
+    <script src="src/plugins/codemirror/mode/sql/sql.js"></script>
     <script src="src/js/script.js"></script>
     <script>
 

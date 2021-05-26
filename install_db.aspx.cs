@@ -8,7 +8,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-public partial class install_db : System.Web.UI.Page
+public partial class install_db : AdminBasePage
 {
     public DBhelper dbhelper = new DBhelper();
     public DataTable dbDataTable = new DataTable();
