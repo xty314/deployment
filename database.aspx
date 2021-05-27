@@ -70,10 +70,10 @@
                                 DB Name
                             </th>
                             <th style="width: 20%">
-                                 MReport URL
+                                Origin
                             </th>
                             <th class="text-center" style="width: 40%">
-                                API
+                                Create Date
                             </th>
 
                             <th style="width: 20%" class="text-right">

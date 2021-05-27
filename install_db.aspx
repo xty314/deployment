@@ -70,14 +70,14 @@
                             <th style="width: 15%">
                                 DB Name
                             </th>
-                            <th style="width: 20%">
-                                 MReport URL
+                            <th >
+                                Description
                             </th>
-                            <th class="text-center" style="width: 40%">
-                                API
+                            <th class="text-center" >
+                               Created Date
                             </th>
 
-                            <th style="width: 20%" class="text-right">
+                            <th class="text-right">
                                 Action
                             </th>
                         </tr>
@@ -96,28 +96,24 @@
                                
                             </td>
                             <td>
-              <%--                <a href="<%="http://" + Request.Url.Host+"/m/" + dr["ReportDir"]+"/index.aspx"%>"
-                                    target="_blank"><%="http://" + Request.Url.Host+"/m/" + dr["ReportDir"]+"/index.aspx"%> </a>--%>
+                                    <%=dr["description"] %>
                             </td>
                             <td class="project_progress  text-center">
-                                               
+                                 <%=dr["created_date"] %>              
                             </td>
 
                             <td class="project-actions text-right">
                             
-                            <div class="btn-group">
-              
-                    <button type="button" class="btn btn-primary  btn-sm dropdown-toggle dropdown-icon" data-toggle="dropdown">
-                      Action
-                    </button>
-                    <div class="dropdown-menu" role="menu">
-                      <a class="dropdown-item" href="./user.aspx?id=<%=dr["id"]%>"><i class="fas fa-user"></i>Update Bak</a>
                    
-                      <div class="dropdown-divider"></div>
-                         <a class="dropdown-item" href="./branch.aspx?id=<%=dr["id"]%>"><i class="fas fa-building"></i>Run Script</a>
-
-                    </div>
-                  </div>
+                                 <a class="btn btn-warning btn-sm edit-btn" href="#">
+                                  <i class="fas fa-plus-circle"></i> Update Bak
+                                </a>
+                                 <a class="btn btn-primary btn-sm edit-btn" href="#">
+                                 <i class="fas fa-caret-square-right"></i> Run Script
+                                </a>
+                                 <a class="btn btn-danger btn-sm edit-btn" href="script.aspx?origin=<%=dr["id"] %>">
+                                  <i class="fas fa-history"></i> Script History
+                                </a>
                                 <a class="btn btn-info btn-sm edit-btn" href="#" 
                                         data-toggle="modal" data-target="#EditModal"
                                          data-id=<%=dr["id"]%>
