@@ -39,12 +39,12 @@
 
         <!-- Sidebar Menu -->
         <nav class="mt-2">
-            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent" data-widget="treeview" role="menu" data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class
                  with font-awesome or any other icon font library -->
-                <li class="nav-item">
+                <li class="nav-item  menu-is-opening menu-open" >
                     <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <i class="nav-icon fas fa-database"></i>
                         <p>
                             Database
                  
@@ -52,18 +52,19 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
+                               <li class="nav-item">
+                            <a href="/database.aspx" class="nav-link ">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Database List</p>
+                            </a>
+                        </li>
                           <li class="nav-item">
                             <a href="/install_db.aspx" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Install DB</p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="/database.aspx" class="nav-link ">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Database List</p>
-                            </a>
-                        </li>
+                 
                         <li class="nav-item">
                             <a href="/script.aspx" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
@@ -72,29 +73,31 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item  menu-is-opening menu-open">
                     <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <i class="nav-icon fab fa-chrome"></i>
                         <p>
                            Web App
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="repository.aspx" class="nav-link ">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Repository</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="./index2.html" class="nav-link">
+                         <li class="nav-item">
+                            <a href="app_list.aspx" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>App</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="./index.html" class="nav-link ">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Repository</p>
+                            </a>
+                        </li>
+                       
                     </ul>
                 </li>
+         
                 <li class="nav-item">
                     <a href="setting.aspx" class="nav-link">
                         <i class="nav-icon fas fa-th"></i>

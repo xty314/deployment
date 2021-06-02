@@ -17,7 +17,7 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Gallery</h1>
+            <h1>Installation BD</h1>
           </div>
          <div class="col-sm-6">
                     <div class="float-right">
@@ -99,7 +99,7 @@
                                     <%=dr["description"] %>
                             </td>
                             <td class="project_progress  text-center">
-                                 <%=dr["created_date"] %>              
+                                 <%=dr["create_date"] %>              
                             </td>
 
                             <td class="project-actions text-right">

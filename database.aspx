@@ -16,7 +16,7 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Gallery</h1>
+            <h1>Database</h1>
           </div>
          <div class="col-sm-6">
                     <div class="float-right">
@@ -177,11 +177,9 @@
                             <label for="recipient-name" class="col-form-label col-sm-4">DB Server:</label>
                             <input type="text" class="form-control  col-sm-8" name='server' value="<%= Common.GetSetting("db_server")%>" />
                         </div>
-                         <div class="form-check">
-                    <input type="checkbox" class="form-check-input form-check-input-lg" name="createDb" id="DbCheck"  value="1" >
-                    <label class="form-check-label" for="DbCheck">create a new Database for the new site.</label>
-                  </div>
-                        <%-- <input type="hidden" class="form-control  col-sm-10" name='company' id="s_new_sscat">--%>
+            
+                        <%=PrintInstallDbList() %>
+                 
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

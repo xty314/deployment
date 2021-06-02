@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.UI;
@@ -28,34 +30,30 @@ public partial class database : AdminBasePage
         //step 1
         string company = Request.Form["dbname"];
         string server = Request.Form["server"];
-        string createDatebase = Request.Form["createDb"];
+        string install_db_id = Request.Form["install_db_id"];
         string companyFolderAndDbName = Regex.Replace(company.ToLower(), @"\s+", "_");
         string sc;
-        if (String.IsNullOrEmpty(createDatebase))
-        {
-            createDatebase = "0";
-        }
+   
        int creator = (int)Session["user_id"];
         //info = (string)Session["login"];
         //return;
         string masterDbConnection = "Server=" + server + ";Database=master;User Id=eznz;password=9seqxtf7";
 
-        if (createDatebase == "1")
+        if (install_db_id != "0")
         {
             //create a new database
             try
             {
                 dbhelper.CreadDatabase(masterDbConnection, companyFolderAndDbName);
-                string databasePath = Common.GetSetting("install_db_location");//还原bak的文件地址路径
-                                                                               //!!!!bak文件需要在数据库的服务器上，地址也为数据库上bak的路径不是aspx程序的服务器
-                                                                               // DBhelper masterHelper = new DBhelper(masterDbConnection);
+
+                sc = "SELECT location FROM install_db where id=" + install_db_id;
+                string databasePath = Path.GetFullPath((string)dbhelper.ExecuteScalar(sc));
+                //还原bak的文件地址路径
+                //!!!!bak文件需要在数据库的服务器上，地址也为数据库上bak的路径不是aspx程序的服务器
+            
                 DBhelper masterHelper = new DBhelper("master");
                 sc = String.Format("RESTORE DATABASE {0} FROM DISK = '{1}' WITH REPLACE", companyFolderAndDbName, databasePath);
                 masterHelper.ExecuteNonQuery(sc);
-
-
-
-
             }
             catch (Exception e)
             {
@@ -80,7 +78,7 @@ public partial class database : AdminBasePage
            new SqlParameter("@TradingName", company),
            new SqlParameter("@DbConnectionString",newDbConnection),
            new SqlParameter("@creator", creator),
-           new SqlParameter("@install_db_id", createDatebase),
+           new SqlParameter("@install_db_id", install_db_id),
 
         };
         try
@@ -111,7 +109,7 @@ public partial class database : AdminBasePage
 
 
 
-        // Common.Refresh();
+      //Common.Refresh();
     }
 
     private void LoadDatabaseList()
@@ -119,5 +117,26 @@ public partial class database : AdminBasePage
         string sc = "select * from  db_list";
         dbDataTable = dbhelper.ExecuteDataTable(sc);
         //throw new NotImplementedException();
+    }
+
+    public string PrintInstallDbList()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.Append(@"<div class='form-group row'>");
+        sb.Append(@"<label class='col-form-label col-sm-4'>Install DB</label>");
+        sb.Append("<select class='form-control col-sm-8' name='install_db_id'>");
+        sb.Append("<option value='0' >Existing Database</option>");
+        string sc = "SELECT * FROM install_db order by id desc";
+        DataTable dt = dbhelper.ExecuteDataTable(sc);
+        foreach (DataRow dr in dt.Rows)
+        {
+            sb.Append(String.Format("<option value={0} >{1}</option>", dr["id"], dr["name"]));
+        }
+
+        sb.Append("</select>");
+        sb.Append("</div>");
+
+        return sb.ToString();
+        //
     }
 }
