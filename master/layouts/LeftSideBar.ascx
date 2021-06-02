@@ -82,7 +82,7 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="./index.html" class="nav-link ">
+                            <a href="repository.aspx" class="nav-link ">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Repository</p>
                             </a>
