@@ -337,7 +337,7 @@ public partial class app_list : AdminBasePage
         string content =JsonConvert.SerializeObject(new
         {
             DataSource=conn.DataSource,
-            DBuser="eznz",
+            DBUser="eznz",
             DBpwd="9seqxtf7",
             DBname= conn.Database,
             AlertEmail= "alter2@eznz.com"
