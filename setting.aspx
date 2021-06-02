@@ -35,6 +35,14 @@
 
   <!-- Main content -->
  <section class="content">
+               <%if (!String.IsNullOrEmpty(info)){ %>
+        <div class="col-lg-12">
+                        <div class="callout callout-danger">
+                            <h5><%=info %></h5>
+
+                        </div>
+                    </div>
+        <%} %>
       <div class="container-fluid">
         <div class="row">
           <!-- left column -->
@@ -46,18 +54,23 @@
               </div>
               <!-- /.card-header -->
               <!-- form start -->
-              <form id="quickForm" novalidate="novalidate">
+              <form id="quickForm" action="?cmd=save" method="post" novalidate="novalidate">
                 <div class="card-body">
                     <%foreach (DataRow dr in settingDataTable.Rows)
                         {%>
-                    <%if (dr["type"] == "bool")
+                    <%if (dr["type"].ToString() == "bool")
                         { %>
-                    <div class="form-group row">
-                        <label for="inputEmail3" class="col-sm-2 col-form-label text-lg-right">Email</label>
+                            <div class="form-group row">
+                        <label for="<%=dr["name"]%>" class="col-sm-2 col-form-label text-lg-right"><%=dr["title"] %> <i class="far fa-question-circle" data-toggle="tooltip" title="<%=dr["description"] %>"></i></label>
                         <div class="col-sm-4">
                             <div class="icheck-primary">
-                                <input type="checkbox" id="checkboxPrimary1" checked="">
-                                <label for="checkboxPrimary1">
+                                <input type="checkbox" id="<%=dr["name"]%>"  onclick="document.getElementById('<%=dr["id"]%>').value=this.checked?1:0;" 
+                                    <%if (dr["value"].ToString().ToLower() == "1")
+                                    {%>
+                                     checked
+                                    <%} %> />
+                                  <input type="hidden" name="<%=dr["name"]%>" id="<%=dr["id"]%>" value="<%=dr["value"]%>">
+                           <label for=<%=dr["name"]%>>
                                 </label>
                             </div>
                         </div>
@@ -66,29 +79,15 @@
                     else
                     { %>
                     <div class="form-group row">
-                        <label for="inputEmail3" class="col-sm-2 col-form-label text-lg-right"><%=dr["title"] %> <i class="far fa-question-circle" data-toggle="tooltip" title="<%=dr["description"] %>"></i></label>
+                        <label for="<%=dr["name"]%>" class="col-sm-2 col-form-label text-lg-right"><%=dr["title"] %> <i class="far fa-question-circle" data-toggle="tooltip" title="<%=dr["description"] %>"></i></label>
                         <div class="col-sm-4">
-                            <input type="email" class="form-control" id="inputEmail3" name="<%=dr["id"] %>" value="<%=dr["value"] %>" placeholder="<%=dr["title"] %>">
+                            <input type="email" class="form-control" id="<%=dr["name"]%>" name="<%=dr["name"]%>" value="<%=dr["value"] %>" placeholder="<%=dr["title"] %>">
                         </div>
                     </div>
                     <%}
                     } %>
-   <div class="form-group row">
-                        <label for="inputEmail3" class="col-sm-2 col-form-label text-lg-right">Email</label>
-                        <div class="col-sm-4">
-                            <div class="icheck-primary">
-                                <input type="checkbox" id="checkboxPrimary1"  onclick="document.all.test.value=this.checked?1:0" 
-                                    <%if (1 == 2)
-                                    {%>
-                                     checked
-                                    <%} %>
-                                  <input type="hidden" id="checkboxPrimary1" name="test" value="0">
-                                <label for="checkboxPrimary1">
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
+         
+          
 
                 </div>
                 <!-- /.card-body -->

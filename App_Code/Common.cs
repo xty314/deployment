@@ -15,7 +15,7 @@ using System.Web;
 /// </summary>
 public class Common
 {
-
+    public static string password = "9aysdata";
     public static List<string> supportedFileTypes = new List<string>(new string[] { "jpg", "jpeg", "gif", "png", "bmp" });
     public static string[] GetCategories(string company)
     {

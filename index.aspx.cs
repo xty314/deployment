@@ -48,7 +48,7 @@ public partial class v2_login : Page
 
                 Session["login"] = "true";
                 Session["user_id"] = userId;
-                Response.Redirect("template.aspx");
+                Response.Redirect("app_list.aspx");
             }
         }
 

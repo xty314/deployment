@@ -29,11 +29,11 @@ public partial class v2_invoice : AdminBasePage
     {
     
         //test();
-        //if (Request.Form["cmd"] == "addNewCompany")
-        //{
-        //    GitTest();
-        //    //CreateNewCompany();
-        //}
+        if (Request.Form["cmd"] == "addNewCompany")
+        {
+            GitTest();
+            //CreateNewCompany();
+        }
         //if (Request.Form["cmd"] == "editCompany")
         //{
         //    EditCompany();
@@ -42,13 +42,13 @@ public partial class v2_invoice : AdminBasePage
         //{
         //    DeleteCompany();
         //}
-      
+
         //companyDataTable=GetListOfCompany();
         //allCategoryDirs = Common.GetAllCategories();
-		
 
 
-	}
+
+    }
     public void GitTest()
     {
         Repository.Clone("https://github.com/xty314/adv.git", "G://test");//x86
