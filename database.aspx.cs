@@ -109,45 +109,43 @@ public partial class database : AdminBasePage
         {
             string connectionString = "Server=" + server + ";Database=" + database + ";User Id=eznz;password=9seqxtf7";
             DBhelper newDBhelper = new DBhelper(connectionString);
-            if (newDBhelper.ConnectTest())
+
+            string sc = "";
+            string oldConnectionString = (string)dbhelper.ExecuteScalar("select conn_str from db_list where id=" + id);
+            if (connectionString != oldConnectionString)
             {
-                string sc = "";
-                string oldConnectionString = (string)dbhelper.ExecuteScalar("select conn_str from db_list where id=" + id);
-                if (connectionString != oldConnectionString)
+                // new database must be able to connected.
+                if (!newDBhelper.ConnectTest())
                 {
-                    //if change the database
-                    //the connection string exists in the db_list
-                    sc = "SELECT count(*) FROM db_list where conn_str='" + connectionString + "'";
-                    int count = (int)dbhelper.ExecuteScalar(sc);
-                    if (count > 0)
-                    {
-                        info = string.Format("server：{0} ,database : {1} has already existed.", server, database);
-                        return;
-                    }
-                    sc = @"UPDATE db_list SET conn_str=@conn_str,install_db_id=0 WHERE id=@id";
-                    SqlParameter[] parameters1 =
-                    {
+                    info = string.Format("Can not connect to server：{0} ,database : {1}", server, database);
+                    return;
+                }
+                //if change the database
+                //the connection string exists in the db_list
+                sc = "SELECT count(*) FROM db_list where conn_str='" + connectionString + "'";
+                int count = (int)dbhelper.ExecuteScalar(sc);
+                if (count > 0)
+                {
+                    info = string.Format("server：{0} ,database : {1} has already existed.", server, database);
+                    return;
+                }
+                sc = @"UPDATE db_list SET conn_str=@conn_str,install_db_id=0 WHERE id=@id";
+                SqlParameter[] parameters1 =
+                {
                         new SqlParameter("@conn_str",connectionString),
                         new SqlParameter("@id",id)
                     };
-                    dbhelper.ExecuteNonQuery(sc, parameters1);
-                }
-
-
-                sc = @"UPDATE db_list SET name=@name,removable=@removable WHERE id=@id";
-                SqlParameter[] parameters =
-                {
+                dbhelper.ExecuteNonQuery(sc, parameters1);
+            }
+            sc = @"UPDATE db_list SET name=@name,removable=@removable WHERE id=@id";
+            SqlParameter[] parameters =
+            {
                        new SqlParameter("@name",name),
                           new SqlParameter("@removable",removable),
                             new SqlParameter("@id",id)
-                 };
-                dbhelper.ExecuteNonQuery(sc, parameters);
-            }
-            else
-            {
-                info = string.Format("Can not connect to server：{0} ,database : {1}", server, database);
-                return;
-            }
+             };
+            dbhelper.ExecuteNonQuery(sc, parameters);
+     
             
        
            
