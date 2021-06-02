@@ -54,11 +54,18 @@ public partial class database : AdminBasePage
             info = "You can not drop this database. This database is unremovable";
             return;
         }
+        //check if there is any web app connecting to this app
+        int count =(int)dbhelper.ExecuteScalar("select count(*) from web_app where db_id=" + id);
+        if (count > 0)
+        {
+            info = "You can not drop this database. This database is occupied by some app.";
+            return;
+        }
         if (origin != 0)
         {
             string database = Common.GetDatabase(dr["conn_str"].ToString());
             //step 1 backup database
-            //todo
+            //todo   
             //if (backup == "1")
             //{
             //    string backupPath = Common.GetSetting("BACKUP_DIR_PATH") + database + ".bak";
@@ -76,7 +83,7 @@ public partial class database : AdminBasePage
         }
 
         try
-        {
+        {   
             //step 3 delete recode
             sc = "DELETE FROM db_list WHERE id=@id";
             SqlParameter sqlParameter2 = new SqlParameter("@id", id);
@@ -100,34 +107,40 @@ public partial class database : AdminBasePage
    
         try
         {
-            string sc = "";
             string connectionString = "Server=" + server + ";Database=" + database + ";User Id=eznz;password=9seqxtf7";
-            string oldConnectionString = (string)dbhelper.ExecuteScalar("select conn_str from db_list where id=" + id);
-            if (connectionString != oldConnectionString)
-            {
-                //if change the database
-                //the connection string exists in the db_list
-                sc = "SELECT count(*) FROM db_list where conn_str='" + connectionString + "'";
-                int count = (int)dbhelper.ExecuteScalar(sc);
-                if (count > 0)
-                {
-                    info = string.Format("server：{0} ,database : {1} has already existed.", server, database);
-                    return;
-                }
-            }
-          
-
-           sc= @"UPDATE db_list SET name=@name,conn_str=@conn_str,removable=@removable WHERE id=@id";
-            SqlParameter[] parameters =
-            {
-           new SqlParameter("@name",name),
-            new SqlParameter("@conn_str",connectionString),
-              new SqlParameter("@removable",removable),
-                new SqlParameter("@id",id)
-        };
             DBhelper newDBhelper = new DBhelper(connectionString);
             if (newDBhelper.ConnectTest())
             {
+                string sc = "";
+                string oldConnectionString = (string)dbhelper.ExecuteScalar("select conn_str from db_list where id=" + id);
+                if (connectionString != oldConnectionString)
+                {
+                    //if change the database
+                    //the connection string exists in the db_list
+                    sc = "SELECT count(*) FROM db_list where conn_str='" + connectionString + "'";
+                    int count = (int)dbhelper.ExecuteScalar(sc);
+                    if (count > 0)
+                    {
+                        info = string.Format("server：{0} ,database : {1} has already existed.", server, database);
+                        return;
+                    }
+                    sc = @"UPDATE db_list SET conn_str=@conn_str,install_db_id=0 WHERE id=@id";
+                    SqlParameter[] parameters1 =
+                    {
+                        new SqlParameter("@conn_str",connectionString),
+                        new SqlParameter("@id",id)
+                    };
+                    dbhelper.ExecuteNonQuery(sc, parameters1);
+                }
+
+
+                sc = @"UPDATE db_list SET name=@name,removable=@removable WHERE id=@id";
+                SqlParameter[] parameters =
+                {
+                       new SqlParameter("@name",name),
+                          new SqlParameter("@removable",removable),
+                            new SqlParameter("@id",id)
+                 };
                 dbhelper.ExecuteNonQuery(sc, parameters);
             }
             else
@@ -135,6 +148,8 @@ public partial class database : AdminBasePage
                 info = string.Format("Can not connect to server：{0} ,database : {1}", server, database);
                 return;
             }
+            
+       
            
          
         }catch(Exception e)
