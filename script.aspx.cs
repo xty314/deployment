@@ -17,6 +17,7 @@ public partial class script : AdminBasePage
     public string info = "";
     protected void Page_Load(object sender, EventArgs e)
     {
+     
         if (Request.Form["cmd"] == "new")
         {
             CreateScript();
@@ -37,14 +38,16 @@ public partial class script : AdminBasePage
         {
             DownloadScript();
         }
+
         LoadScriptList();
     }
 
+   
     private void EditScript()
     {
 
         string scriptId = Request.Form["id"];
-        string name= Request.Form["name"];
+        string name= Request.Form["name"].ToString().Trim();
         string description= Request.Form["description"];
         string sc = "UPDATE  script SET name=@name,description=@description WHERE id=@id";
         SqlParameter[] sqlParameters =
@@ -68,7 +71,7 @@ public partial class script : AdminBasePage
     private void CreateScript()
     {
        string content = Request["content"];
-        string name = Request.Form["name"];
+        string name = Request.Form["name"].ToString().Trim();
         string description = Request.Form["description"];
         string scriptPath = Server.MapPath("~/script/" + name + ".sql");
 

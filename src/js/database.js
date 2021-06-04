@@ -38,24 +38,38 @@ $(document).on("click", ".edit-btn", function () {
     }
 
 })
-$(document).on("click", ".copy-btn", function (e) {
-    var apiContent = $(this).prev().html();
 
-    var ele = document.createElement("input"); //创建一个input标签
-    ele.setAttribute("value", apiContent); // 设置改input的value值
-    document.body.appendChild(ele); // 将input添加到body
-    ele.select();  // 获取input的文本内容
-    document.execCommand("copy"); // 执行copy指令
-    document.body.removeChild(ele); // 删除input标签
-    var Toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000
-    });
-    Toast.fire({
-        icon: "success",
-        title: apiContent +" has already been copied."
+
+$(document).on("click", ".script-btn", function (e) {
+
+    var id = $(this).data("id");
+    $("#ScriptForm input[name=id]").val(id)
+    console.log(id);
+    $.ajax({
+        type: "get",
+        url: "handler/ScriptDuallist.ashx?dbid="+id,
+        success: function (res) {
+            $('#scriptDuallist').bootstrapDualListbox("destroy");
+            $('#scriptDuallist').remove();
+            $("#scriptLabel").after(res);
+            $('#scriptDuallist').bootstrapDualListbox({
+                nonSelectedListLabel: 'Unexecuted Scripts',
+                selectedListLabel: 'Executed Scripts',
+                selectorMinimalHeight: 300,
+                filterTextClear: 'Show All',
+                filterPlaceHolder: 'Filter',
+                moveSelectedLabel: "Add",
+                moveAllLabel: 'Select All',
+                removeSelectedLabel: "Remove",
+                removeAllLabel: 'Remove All',
+                infoText: ' {0} scripts ',
+                infoTextFiltered: 'get {0} scripts ,total {1} scripts',
+                infoTextEmpty: 'No scripts ',
+            });
+       
+
+    
+        }
+
     })
-
 })

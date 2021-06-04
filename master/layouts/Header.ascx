@@ -15,6 +15,8 @@
     <%--<link href="/src/plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet" />--%>
  <!-- bootstrap datepicker -->
 <%--<link href="/src/plugins/bootstrap-datepicker/css/datepicker.css" rel="stylesheet" />--%>
+  <!-- Bootstrap4 Duallistbox -->
+  <link rel="stylesheet" href="../../plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
 <link href="/src/plugins/bootstrap-datepicker/datepicker.css" rel="stylesheet" />
   <!-- Bootstrap Color Picker -->
   <link rel="stylesheet" href="/src/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">

@@ -30,8 +30,11 @@ public partial class database : AdminBasePage
         {
             DeleteDatabase();
         }
+     
         LoadDatabaseList();
     }
+
+ 
 
     private void DeleteDatabase()
     {
@@ -245,7 +248,8 @@ public partial class database : AdminBasePage
 	                                        [uploader] [int] NULL,
 	                                        [upload_date] [datetime] NULL,
 	                                        [description] [ntext] NOT NULL,
-	                                        [location] [nvarchar](max) NULL
+	                                        [location] [nvarchar](max) NULL,
+	                                        [execute_date] [datetime] NULL CONSTRAINT [DF_script_execute_date]  DEFAULT (getdate())
                                         ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]";
                 newdbHelper.ExecuteNonQuery(createScriptTable);
             }
