@@ -91,7 +91,7 @@
                                 #<%=dr["id"]%>
                             </td>
                             <td>
-                                <a href="<%=Common.AppendUrl(Request.Url.PathAndQuery,"id="+dr["id"].ToString())%>">
+                                <a href="script.aspx?id=<%=dr["id"]%>">
                                     <%=dr["name"] %>
                                 </a>
                                
