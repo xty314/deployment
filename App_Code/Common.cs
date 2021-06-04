@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
@@ -176,18 +177,19 @@ public class Common
         SqlConnection conn = new SqlConnection(connectionString);
         return conn.DataSource;
     }
-    public static string AppendUrl(string url,string query)
+    public static string AppendUrl(string key,string value)
     {
+        //获取 站点名+页面名：
+        string url = HttpContext.Current.Request.Url.AbsolutePath;
+    
+        string querys = HttpContext.Current.Request.Url.Query;
 
-        string result = "";
-        if (url.IndexOf("?") != -1)
-        {
-            result = url + "&" + query;
-        }
-        else
-        {
-            result = url + "?" + query;
-        }
+
+        NameValueCollection query = HttpUtility.ParseQueryString(querys);
+        query[key] = value;
+     
+        string result =url+"?"+query.ToString();
+     
         return result;
     }
 }
