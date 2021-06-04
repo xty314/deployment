@@ -92,7 +92,7 @@
                                 <%=dr["db_name"] %>
                             </td>
                             <td>
-                                <%=string.Format(Common.GetSetting("cloud_sync_api"),dr["db_id"]) %>
+                                <!--%=string.Format(Common.GetSetting("cloud_sync_api"),dr["id"]) %--> 
 
                             </td>
                             <td>

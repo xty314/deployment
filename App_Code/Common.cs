@@ -176,7 +176,20 @@ public class Common
         SqlConnection conn = new SqlConnection(connectionString);
         return conn.DataSource;
     }
+    public static string AppendUrl(string url,string query)
+    {
 
+        string result = "";
+        if (url.IndexOf("?") != -1)
+        {
+            result = url + "&" + query;
+        }
+        else
+        {
+            result = url + "?" + query;
+        }
+        return result;
+    }
 }
 
 
