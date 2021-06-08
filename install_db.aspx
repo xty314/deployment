@@ -278,5 +278,5 @@
 </asp:Content>
 <asp:Content ContentPlaceHolderId="AdditionalJS" runat="server">
 
- 
+    <script src="src/js/run_script.js"></script>
 </asp:Content>
