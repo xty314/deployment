@@ -249,6 +249,8 @@ public partial class database : AdminBasePage
 	                                        [upload_date] [datetime] NULL,
 	                                        [description] [ntext] NOT NULL,
 	                                        [location] [nvarchar](max) NULL,
+                                            [executer] [int] NULL,
+                                            [record_id] [int] NULL,
 	                                        [execute_date] [datetime] NULL CONSTRAINT [DF_script_execute_date]  DEFAULT (getdate())
                                         ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]";
                 newdbHelper.ExecuteNonQuery(createScriptTable);

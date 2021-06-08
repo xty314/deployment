@@ -15,11 +15,21 @@ public partial class execute : AdminBasePage
         if (Request.Form["cmd"] == "run")
         {
             Response.Clear();
-            RunScript();
+            RunScript(false);//database.aspx
+            Response.End();
+        }
+        else if (Request.Form["cmd"] == "install")
+        {
+            Response.Clear();
+            RunScript(true);//install_db.aspx
             Response.End();
         }
     }
-    private void RunScript()
+    /// <summary>
+    /// run script for all database in the list
+    /// </summary>
+    /// <param name="bIsInstallDB">if true for install_db.aspx, false for database.aspx</param>
+    private void RunScript(bool bIsInstallDB)
     {
         string[] dbIds = Request.Form.GetValues("id");
         string[] scriptIds = Request.Form.GetValues("scripts");
@@ -36,19 +46,23 @@ public partial class execute : AdminBasePage
             Response.Flush();
             return;
         }
-        //List<string> conn_strs = new List<string>();
-        //foreach(string dbId in dbIds)
-        //{
-        //    string conn_str = (string)dbhelper.ExecuteScalar("SELECT conn_str from db_list where id=" + dbId);
-        //    conn_strs.Add(conn_str);
-        //}
-
-        string cmd = "SELECT id,conn_str,0 as is_install  from db_list where  id in ('" + string.Join("','", dbIds) + "')";
-        if (install_db == "1")
+        string cmd;
+        if (!bIsInstallDB)
         {
-            cmd += " UNION ";
-            cmd += "select distinct id.id,id.conn_str,1 as is_install from db_list dl left join install_db id on dl.install_db_id=id.id where id.id is not null and dl.id in ('" + string.Join("','", dbIds) + "')";
+            //false for database.aspx  run script for all database
+            cmd = "SELECT id,conn_str,0 as is_install  from db_list where  id in ('" + string.Join("','", dbIds) + "')";
+            if (install_db == "1")
+            {
+                cmd += " UNION ";
+                cmd += "select distinct id.id,id.conn_str,1 as is_install from db_list dl left join install_db id on dl.install_db_id=id.id where id.id is not null and dl.id in ('" + string.Join("','", dbIds) + "')";
+            }
         }
+        else
+        {
+            //false for install_db.aspx  run script for the indicated install db
+            cmd = "SELECT id,conn_str,1 as is_install  from install_db where  in ('" + string.Join("','", dbIds) + "')";
+        }
+       
 
         DataTable dbDataTable = dbhelper.ExecuteDataTable(cmd);
 
@@ -116,20 +130,9 @@ public partial class execute : AdminBasePage
                     Response.Flush();
 
 
+                    //record in the tenant db save into script_record table
 
-                    //run script successfully following record.
-                    string sql = " insert into script (id,name,uploader,upload_date,description,location) values (@id,@name,@uploader,@upload_date,@description,@location) ";
-                    SqlParameter[] sqlParameters = {
-                        new SqlParameter("@id",scriptDr["id"].ToString()),
-                        new SqlParameter("@name",scriptDr["name"].ToString()),
-                        new SqlParameter("@uploader",scriptDr["uploader"].ToString()),
-                         new SqlParameter("@upload_date",scriptDr["upload_date"].ToString()),
-                        new SqlParameter("@description",scriptDr["description"].ToString()),
-                        new SqlParameter("@location",scriptDr["location"].ToString()),
-                    };
-                    //record in the tenant db
-                    tenantDbHelper.ExecuteNonQuery(sql, sqlParameters);
-                    sql = @"insert into script_record (script_id,db_id,install_db_id) select @script_id
+                    string sql = @"insert into script_record (script_id,db_id,install_db_id) select @script_id
                             ,isnull((select id from db_list where conn_str=@conn_str),0)
                             ,isnull((select id from install_db where conn_str=@conn_str),0)";
                     SqlParameter[] sqlParameters1 = {
@@ -137,7 +140,25 @@ public partial class execute : AdminBasePage
                         new SqlParameter("@conn_str",conn_str),
                     };
                     //record in the host db
-                    dbhelper.ExecuteNonQuery(sql, sqlParameters1);
+                    int scriptRecordId=dbhelper.InsertAndGetId(sql, sqlParameters1);
+
+
+
+
+                    //run script successfully following record.
+                   sql = " insert into script (id,name,uploader,upload_date,description,location,executer,record_id) values (@id,@name,@uploader,@upload_date,@description,@location,@executer,@record_id) ";
+                    int executer = (int)Session["user_id"];
+                    SqlParameter[] sqlParameters = {
+                        new SqlParameter("@id",scriptDr["id"].ToString()),
+                        new SqlParameter("@name",scriptDr["name"].ToString()),
+                        new SqlParameter("@uploader",scriptDr["uploader"].ToString()),
+                         new SqlParameter("@upload_date",scriptDr["upload_date"].ToString()),
+                        new SqlParameter("@description",scriptDr["description"].ToString()),
+                        new SqlParameter("@location",scriptDr["location"].ToString()),
+                        new SqlParameter("@executer",executer),
+                        new SqlParameter("@record_id",scriptRecordId),
+                    };
+                    tenantDbHelper.ExecuteNonQuery(sql, sqlParameters);
                 }
                 Response.Write(String.Format("<h1>Database:{0} excuted {1} scripts.</h1>", Common.GetDatabase(conn_str), scriptIds.Length));
                 Response.Flush();

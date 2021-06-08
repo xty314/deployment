@@ -312,4 +312,5 @@
 <asp:Content ContentPlaceHolderID="AdditionalJS" runat="server">
 
     <script src="src/js/database.js"></script>
+    <script src="src/js/run_script.js"></script>
 </asp:Content>
