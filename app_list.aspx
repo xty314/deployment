@@ -62,7 +62,7 @@
                             </th>
                             <th>Database
                             </th>
-                            <th>Create Date
+                            <th>Api
                             </th>
                             <th class="text-center">Last Update Date
                             </th>
@@ -92,7 +92,8 @@
                                 <%=dr["db_name"] %>
                             </td>
                             <td>
-                                <%=dr["create_date"] %>
+                                <%=string.Format(Common.GetSetting("cloud_sync_api"),dr["db_id"]) %>
+
                             </td>
                             <td>
                                 <%=dr["last_update_date"] %>            
