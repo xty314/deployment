@@ -342,20 +342,21 @@ public partial class app_list : AdminBasePage
             DBname= conn.Database,
             AlertEmail= "alter2@eznz.com"
         });
-        string appSettingsPath = path + "\\\\appSettings.json";
+        string appSettingsPath = Path.Combine(path, "appSettings.json").ToString() ;
+
         if (File.Exists(appSettingsPath))
         {
             File.Delete(appSettingsPath);
         }
         using (FileStream fs = File.Open(appSettingsPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
         {
-           
+
             Byte[] info = new UTF8Encoding(true).GetBytes(content);
             // Add some information to the file.
             fs.Write(info, 0, info.Length);
         }
 
-   
+
     }
     private bool PublishWeb(string webName,string path)
     {
