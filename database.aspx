@@ -6,24 +6,27 @@
 
 <%@ Import Namespace="System.Data.SqlClient" %>
 <%@ Import Namespace="System.Data" %>
-<asp:Content ContentPlaceHolderID="AdditionalCSS" runat="server">
-</asp:Content>
+
 
 <asp:Content ContentPlaceHolderID="Header" runat="server">
     <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6 row">
-                    <h1 class="mr-5">Database</h1>     <%=PrintInstallDbListHeader() %>
+                    <h1 class="mr-5">Database</h1>
+                    <%=PrintInstallDbListHeader() %>
                 </div>
                 <div class="col-sm-6">
                     <div class="float-right">
                         <button class="btn bg-blue" data-toggle="modal" data-target="#NewModal">
                             <i
-                                class="fa fa-pen"></i> Add New Database</button>
-                        <%if(!string.IsNullOrEmpty(Request.QueryString["origin"])&&Request.QueryString["origin"]!="0") {%>
-                        <button class="btn bg-indigo" data-toggle="modal" data-target="#ScriptModal"><i
-                                class="fa fa-book"></i> Run Script </button>
+                                class="fa fa-pen"></i>Add New Database</button>
+                        <%if (!string.IsNullOrEmpty(Request.QueryString["origin"]) && Request.QueryString["origin"] != "0")
+                            {%>
+                        <button class="btn bg-indigo" data-toggle="modal" data-target="#ScriptModal">
+                            <i
+                                class="fa fa-book"></i>Run Script
+                        </button>
                         <%} %>
                         <%-- <button type="button" class="btn btn-success"><i class="fa fa-download"></i>Export </button>--%>
                     </div>
@@ -50,28 +53,32 @@
         <%} %>
         <!-- Default box -->
         <div class="card">
-           
+
             <div class="card-body p-0" style="display: block;">
                 <table class="table table-striped table-hover projects">
                     <thead>
                         <tr>
-                            <th style="width: 1%">
-                                <input type="checkbox" value=/>
+                                <%if (!string.IsNullOrEmpty(Request.QueryString["origin"]) && Request.QueryString["origin"] != "0")
+                            {%>
+                       <th style="width: 1%">
+                                <input type="checkbox" value="" />
                             </th>
+                        <%} %>
+                           
                             <th style="width: 1%">#id
                             </th>
-                            <th > Name
+                            <th>Name
                             </th>
-                             <th >Database
+                            <th>Database
                             </th>
-                             <th >Server
+                            <th>Server
                             </th>
-                            <th >Origin
+                            <th>Origin
                             </th>
-                            <th >Create Date
+                            <th>Create Date
                             </th>
 
-                            <th  class="text-right">Action
+                            <th class="text-right">Action
                             </th>
                         </tr>
                     </thead>
@@ -79,19 +86,27 @@
                         <%foreach (DataRow dr in dbDataTable.Rows)
                             {%>
                         <tr>
-                             <td>
-                                  <input type="checkbox" value="<%=dr["id"]%>" name="db_id"/>
+                                  <%if (!string.IsNullOrEmpty(Request.QueryString["origin"]) && Request.QueryString["origin"] != "0")
+                            {%>
+                       <td>
+                           <div class="icheck-primary">
+                                <input type="checkbox" id="someCheckboxId"  value="<%=dr["id"]%>" name="db_id" />
+                                <label for="someCheckboxId"></label>
+                            </div>
+                                
                             </td>
+                        <%} %>
+                          
                             <td>#<%=dr["id"]%>
                             </td>
                             <td>
                                 <%=dr["name"] %>
                             </td>
-                              <td>
+                            <td>
                                 <%=Common.GetDatabase(dr["conn_str"].ToString()) %>
                             </td>
-                              <td>
-                                 <%=Common.GetServer(dr["conn_str"].ToString()) %>
+                            <td>
+                                <%=Common.GetServer(dr["conn_str"].ToString()) %>
                             </td>
                             <td>
                                 <%=dr["install_db_name"] %>
@@ -104,19 +119,19 @@
                                 <a class="btn bg-navy btn-sm deploy-btn"
                                     href="script.aspx?db=<%=dr["id"] %>"
                                     data-id="<%=dr["id"] %>">
-                                    <i class="fas fa-history"></i> Script History
+                                    <i class="fas fa-history"></i>Script History
                                 </a>
-                                       <a class="btn btn-warning btn-sm deploy-btn"
+                                <a class="btn btn-warning btn-sm deploy-btn"
                                     data-toggle="modal" data-target="#DeployModal"
                                     data-id="<%=dr["id"] %>">
-                                    <i class="fas fa-download"></i> Back up
+                                    <i class="fas fa-download"></i>Back up
                                 </a>
                                 <a class="btn bg-indigo btn-sm script-btn" href="#"
                                     data-toggle="modal" data-target="#ScriptModal" data-id='<%=dr["id"]%>'>
                                     <i class="fas fa-book"></i>
                                     Run Script
                                 </a>
-                            
+
                                 <a class="btn btn-info btn-sm edit-btn" href="#"
                                     data-toggle="modal" data-target="#EditModal"
                                     data-id='<%=dr["id"]%>'
@@ -198,7 +213,7 @@
                             <label for="editName" class="col-form-label col-sm-4">Name:</label>
                             <input type="text" class="form-control  col-sm-8" id="editName" name='name'>
                         </div>
-                  
+
                         <div class="form-group row">
                             <label for="editDatabase" class="col-form-label col-sm-4">Database:</label>
                             <input type="text" class="form-control  col-sm-8" id="editDatabase" name='database' />
@@ -234,7 +249,7 @@
                     </div>
                     <div class="modal-body" id="DeleteModalBody">
                         <input type="hidden" class="form-control  col-sm-8" name='id' />
-                       
+
                         <h5 id="deletePrompt"></h5>
                         <div class="form-group row">
                             <label for="recipient-name" class="col-form-label col-sm-4">Password:</label>
@@ -245,7 +260,7 @@
                             <label class="form-check-label" for="deleteDbCheck">delete database.</label>
                         </div>
                         <div class="form-check">
-                            <input type="checkbox" class="form-check-input form-check-input-lg" name="backup" id="backupCheck" value="1" >
+                            <input type="checkbox" class="form-check-input form-check-input-lg" name="backup" id="backupCheck" value="1">
                             <label class="form-check-label" for="backupCheck">back up database.</label>
                         </div>
 
@@ -259,9 +274,43 @@
             </div>
         </div>
     </form>
+    <form method="post" action="execute.aspx" id='ScriptForm'>
+        <div class="modal fade" id="ScriptModal" tabindex="-1" role="dialog"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Run Script</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" class="form-control  col-sm-8" name='id'  />
+                      <div class="form-check">
+                            <input type="checkbox" class="form-check-input " id="cbx1" name="install_db"  value="1">
+                            <label class="form-check-label" for="cbx1">Update install database</label>
+                        </div>
+                        <div class="form-group row">
+                            <label for="editDatabase" class="col-form-label col-sm-4" id="scriptLabel">Script:</label>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" name='cmd' value='run' class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
     <!-- /.content -->
+</asp:Content>
+<asp:Content ContentPlaceHolderID="AdditionalCSS" runat="server">
+
 </asp:Content>
 <asp:Content ContentPlaceHolderID="AdditionalJS" runat="server">
 
     <script src="src/js/database.js"></script>
+    <script src="src/js/run_script.js"></script>
 </asp:Content>

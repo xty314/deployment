@@ -38,24 +38,5 @@ $(document).on("click", ".edit-btn", function () {
     }
 
 })
-$(document).on("click", ".copy-btn", function (e) {
-    var apiContent = $(this).prev().html();
 
-    var ele = document.createElement("input"); //创建一个input标签
-    ele.setAttribute("value", apiContent); // 设置改input的value值
-    document.body.appendChild(ele); // 将input添加到body
-    ele.select();  // 获取input的文本内容
-    document.execCommand("copy"); // 执行copy指令
-    document.body.removeChild(ele); // 删除input标签
-    var Toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000
-    });
-    Toast.fire({
-        icon: "success",
-        title: apiContent +" has already been copied."
-    })
 
-})

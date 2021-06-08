@@ -33,6 +33,22 @@ public partial class install_db : AdminBasePage
         DBhelper installDbHelper = new DBhelper(newInsatllDbConnection);
         if (installDbHelper.ConnectTest())
         {
+            if (!installDbHelper.IsExistTable("script"))
+            {
+                string createScriptTable = @"CREATE TABLE [dbo].[script](
+	                                        [id] [int] NULL,
+	                                        [name] [nvarchar](50) NULL,
+	                                        [uploader] [int] NULL,
+	                                        [upload_date] [datetime] NULL,
+	                                        [description] [ntext] NOT NULL,
+	                                        [location] [nvarchar](max) NULL,
+                                            [executer] [int] NULL,
+                                            [record_id] [int] NULL,
+	                                        [execute_date] [datetime] NULL CONSTRAINT [DF_script_execute_date]  DEFAULT (getdate())
+                                        ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]";
+                installDbHelper.ExecuteNonQuery(createScriptTable);
+            }
+           
             string sc = "INSERT INTO install_db(name,location,conn_str,description) VALUES (@name,@location,@conn,@description)";
 
             SqlParameter[] sqlParameters =
@@ -43,6 +59,7 @@ public partial class install_db : AdminBasePage
                   new SqlParameter("@description",description)
             };
             dbhelper.ExecuteNonQuery(sc, sqlParameters);
+
         }
         else
         {
