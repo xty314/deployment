@@ -25,7 +25,8 @@
                             {%>
                         <button class="btn bg-indigo" data-toggle="modal" data-target="#ScriptModal">
                             <i
-                                class="fa fa-book"></i>Run Script
+                                class="fa fa-book"></i>
+                            Bulk Run Script
                         </button>
                         <%} %>
                         <%-- <button type="button" class="btn btn-success"><i class="fa fa-download"></i>Export </button>--%>
@@ -51,6 +52,7 @@
             </div>
         </div>
         <%} %>
+        <form method="post">
         <!-- Default box -->
         <div class="card">
 
@@ -58,13 +60,16 @@
                 <table class="table table-striped table-hover projects">
                     <thead>
                         <tr>
-                                <%if (!string.IsNullOrEmpty(Request.QueryString["origin"]) && Request.QueryString["origin"] != "0")
-                            {%>
-                       <th style="width: 1%">
-                                <input type="checkbox" value="" />
+                            <%if (!string.IsNullOrEmpty(Request.QueryString["origin"]) && Request.QueryString["origin"] != "0")
+                                {%>
+                            <th style="width: 1%">
+                                  <div class="icheck-primary">
+                                    <input type="checkbox" id="dbCBXAll"  name="db_id" />
+                                    <label for="dbCBXAll"></label>
+                                </div>
                             </th>
-                        <%} %>
-                           
+                            <%} %>
+
                             <th style="width: 1%">#id
                             </th>
                             <th>Name
@@ -86,17 +91,17 @@
                         <%foreach (DataRow dr in dbDataTable.Rows)
                             {%>
                         <tr>
-                                  <%if (!string.IsNullOrEmpty(Request.QueryString["origin"]) && Request.QueryString["origin"] != "0")
-                            {%>
-                       <td>
-                           <div class="icheck-primary">
-                                <input type="checkbox" id="someCheckboxId"  value="<%=dr["id"]%>" name="db_id" />
-                                <label for="someCheckboxId"></label>
-                            </div>
-                                
+                            <%if (!string.IsNullOrEmpty(Request.QueryString["origin"]) && Request.QueryString["origin"] != "0")
+                                {%>
+                            <td>
+                                <div class="icheck-primary">
+                                    <input type="checkbox" id="dbCBX<%=dr["id"]%>" value="<%=dr["id"]%>" name="db_id" />
+                                    <label for="dbCBX<%=dr["id"]%>"></label>
+                                </div>
+
                             </td>
-                        <%} %>
-                          
+                            <%} %>
+
                             <td>#<%=dr["id"]%>
                             </td>
                             <td>
@@ -116,23 +121,27 @@
                             </td>
 
                             <td class="project-actions text-right">
-                                <a class="btn bg-navy btn-sm deploy-btn"
+                                <a class="btn bg-navy btn-sm deploy-btn ml-1 mb-1"
                                     href="script.aspx?db=<%=dr["id"] %>"
                                     data-id="<%=dr["id"] %>">
-                                    <i class="fas fa-history"></i>Script History
+                                    <i class="fas fa-history"></i>
+                                    Script History
                                 </a>
-                                <a class="btn btn-warning btn-sm deploy-btn"
-                                    data-toggle="modal" data-target="#DeployModal"
-                                    data-id="<%=dr["id"] %>">
-                                    <i class="fas fa-download"></i>Back up
-                                </a>
-                                <a class="btn bg-indigo btn-sm script-btn" href="#"
-                                    data-toggle="modal" data-target="#ScriptModal" data-id='<%=dr["id"]%>'>
+                                <button class="btn btn-warning btn-sm backup-btn ml-1 mb-1"
+                                   
+                                   name="backupDb" value="<%=Common.GetDatabase(dr["conn_str"].ToString()) %>"
+                                    >
+                                    <i class="fas fa-download"></i> Back up
+                                </button>
+                                <a class="btn bg-indigo btn-sm script-btn ml-1 mb-1" href="#"
+                                    data-toggle="modal" data-target="#ScriptModal" data-id='<%=dr["id"]%>'
+                                    data-install=false
+                                    >
                                     <i class="fas fa-book"></i>
                                     Run Script
                                 </a>
 
-                                <a class="btn btn-info btn-sm edit-btn" href="#"
+                                <a class="btn btn-info btn-sm edit-btn ml-1 mb-1" href="#"
                                     data-toggle="modal" data-target="#EditModal"
                                     data-id='<%=dr["id"]%>'
                                     data-name="<%=dr["name"] %>"
@@ -162,7 +171,7 @@
             <!-- /.card-body -->
         </div>
         <!-- /.card -->
-
+        </form>
     </section>
     <form method="post" id='NewForm'>
         <div class="modal fade" id="NewModal" tabindex="-1" role="dialog"
@@ -208,7 +217,7 @@
                     </div>
                     <div class="modal-body">
                         <input type="hidden" class="form-control  col-sm-8" name='id' />
-                        <input type="hidden" class="form-control  col-sm-8" name='reportDir' />
+                       
                         <div class="form-group row">
                             <label for="editName" class="col-form-label col-sm-4">Name:</label>
                             <input type="text" class="form-control  col-sm-8" id="editName" name='name'>
@@ -286,9 +295,9 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <input type="hidden" class="form-control  col-sm-8" name='id'  />
-                      <div class="form-check">
-                            <input type="checkbox" class="form-check-input " id="cbx1" name="install_db"  value="1">
+                        <input type="hidden" class="form-control  col-sm-8" name='id' />
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input " id="cbx1" name="install_db" value="1">
                             <label class="form-check-label" for="cbx1">Update install database</label>
                         </div>
                         <div class="form-group row">
@@ -307,10 +316,9 @@
     <!-- /.content -->
 </asp:Content>
 <asp:Content ContentPlaceHolderID="AdditionalCSS" runat="server">
-
 </asp:Content>
 <asp:Content ContentPlaceHolderID="AdditionalJS" runat="server">
 
     <script src="src/js/database.js"></script>
-    <script src="src/js/run_script.js"></script>
+
 </asp:Content>

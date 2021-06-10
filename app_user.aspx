@@ -1,9 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="branch.aspx.cs" Inherits="admin_branch" MasterPageFile="./master/_layout.master"%>
-
-
-<%--注意加入MasterPageFile--%>
-
-
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="app_user.aspx.cs" Inherits="app_user" MasterPageFile="./master/_layout.master"%>
 
 <%@Import Namespace="System.Data.SqlClient" %>
 <%@Import Namespace ="System.Data" %>
@@ -15,13 +10,13 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0 text-dark" id="Title1"><%=companyName%></h1>
+                    <h1 class="m-0 text-dark" id="Title1">APP:<%=appName%>  Page:User</h1>
                 </div>
                 <!-- /.col -->
                 <div class="col-sm-6">
                     <div class="float-right">
-                        <button class="btn bg-blue" data-toggle="modal" data-target="#NewBranchModal"><i
-                                class="fa fa-pen"></i> Add New Branch </button>
+                        <button class="btn bg-blue" data-toggle="modal" data-target="#NewUserModal"><i
+                                class="fa fa-pen"></i> Add New User </button>
                          <%--<button class="btn bg-blue" data-toggle="modal" data-target="#NewCompanyModal"><i
                                 class="fa fa-pen"></i>Update </button>--%>
                         <%-- <button type="button" class="btn btn-success"><i class="fa fa-download"></i>Export </button>--%>
@@ -60,7 +55,7 @@
                                 Name
                             </th>
                             <th style="width: 20%">
-                                Address
+                                Email
                             </th>
                 
 
@@ -70,7 +65,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                     <%foreach (DataRow dr in branchDatatable.Rows)
+                     <%foreach (DataRow dr in userDatatable.Rows)
                             {%>
                          <tr>
                             <td>
@@ -81,37 +76,36 @@
                             </td>
                             <td>
                                 <a>
-                                    <%=dr["address1"] %><br />
-                                  <small>  <%=dr["address2"] %>   <%=dr["address3"] %></small>
+                                    <%=dr["email"] %>
                                 </a>
                                
                             </td>
+                       
+                       
+
                             <td class="project-actions text-right">
                                 
                                     <a class="btn btn-info btn-sm edit-btn" href="#" 
-                                   data-toggle="modal" data-target="#EditBranchModal"
+                                   data-toggle="modal" data-target="#EditUserModal"
                                          data-id=<%=dr["id"]%>
                                          data-name=<%=dr["name"]%>
-                                         data-address1=<%=dr["address1"]%>
-                                        data-address2=<%=dr["address2"]%>
-                                        data-address3=<%=dr["address3"]%>
+                                         data-email=<%=dr["email"]%>
                                         >
                                     <i class="fas fa-pencil-alt">
                                     </i>
                                    EDIT
                                 </a>
-                                <%if (dr["id"].ToString() != "1")
-                                    { %>
                                    <a class="btn btn-danger btn-sm delete-btn" href="#" 
-                                        data-toggle="modal" data-target="#DeleteBranchModal"
+                                        data-toggle="modal" data-target="#DeleteUserModal"
                                           data-id=<%=dr["id"]%>                                      
-                                         data-name=<%=dr["name"]%>
+                                         data-email=<%=dr["email"]%>
+                   
                                       >
                                     <i class="fas fa-trash">
                                     </i>
                                    DELETE
                                 </a>
-                               <%} %>
+                               
                             </td>
                         </tr>
                         <%} %>
@@ -126,34 +120,29 @@
 
     </section>
     <!-- /.content -->
-    <form  method="post" id='NewBranchForm'>
-        <div class="modal fade" id="NewBranchModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    <form  method="post" id='NewUserForm'>
+        <div class="modal fade" id="NewUserModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
             aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">New Branch</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">New User</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        
                         <div class="form-group row">
                             <label for="recipient-name" class="col-form-label col-sm-4">Name:</label>
                             <input type="text" class="form-control  col-sm-8" name='name'>
                         </div>
                         <div class="form-group row">
-                            <label for="recipient-name" class="col-form-label col-sm-4">Address:</label>
-                            <input type="text" class="form-control  col-sm-8" name='address1' />
+                            <label for="recipient-name" class="col-form-label col-sm-4">Email:</label>
+                            <input type="text" class="form-control  col-sm-8" name='email' />
                         </div>
-                          <div class="form-group row">
-                            <label for="recipient-name" class="col-form-label col-sm-4">Suburb:</label>
-                            <input type="text" class="form-control  col-sm-8" name='address2' />
-                        </div>
-                          <div class="form-group row">
-                            <label for="recipient-name" class="col-form-label col-sm-4">City:</label>
-                            <input type="text" class="form-control  col-sm-8" name='address3' />
+                        <div class="form-group row">
+                            <label for="recipient-name" class="col-form-label col-sm-4">Password:</label>
+                            <input type="text" class="form-control  col-sm-8" name='password' />
                         </div>
                     
 
@@ -161,19 +150,19 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" name='cmd' value='addNewBranch' class="btn btn-primary">Save</button>
+                        <button type="submit" name='cmd' value='addNewUser' class="btn btn-primary">Save</button>
                     </div>
                 </div>
             </div>
         </div>
     </form>
-    <form  method="post" id='EditBranchForm'>
-        <div class="modal fade" id="EditBranchModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    <form  method="post" id='EditUserForm'>
+        <div class="modal fade" id="EditUserModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
             aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Eidt Branch</h5>
+                        <h5 class="modal-title">Eidt User</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -186,36 +175,35 @@
                             <input type="text" class="form-control  col-sm-8" name='name'>
                         </div>
                         <div class="form-group row">
-                            <label for="recipient-name" class="col-form-label col-sm-4">Address:</label>
-                            <input type="text" class="form-control  col-sm-8" name='address1' />
+                            <label for="recipient-name" class="col-form-label col-sm-4">Email:</label>
+                            <input type="text" class="form-control  col-sm-8" name='email' />
                         </div>
-                          <div class="form-group row">
-                            <label for="recipient-name" class="col-form-label col-sm-4">Suburb:</label>
-                            <input type="text" class="form-control  col-sm-8" name='address2' />
+                          <div class="form-group row" style="display:none" id="passwordRow">
+                            <label for="recipient-name" class="col-form-label col-sm-4">New Password:</label>
+                            <input type="text" class="form-control  col-sm-8" name='password' disabled/>
                         </div>
-                          <div class="form-group row">
-                            <label for="recipient-name" class="col-form-label col-sm-4">City:</label>
-                            <input type="text" class="form-control  col-sm-8" name='address3' />
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input form-check-input-lg"  id="passwordChange" value="true" name="changePassword" >
+                            <label class="form-check-label" for="passwordChange">Change password</label>
                         </div>
-                  
                  
          
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" name='cmd' value='editBranch' class="btn btn-primary">Save</button>
+                        <button type="submit" name='cmd' value='editUser' class="btn btn-primary">Save</button>
                     </div>
                 </div>
             </div>
         </div>
     </form>
-     <form  method="post" id='DeleteBranchForm'>
-        <div class="modal fade" id="DeleteBranchModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     <form  method="post" id='DeleteUserForm'>
+        <div class="modal fade" id="DeleteUserModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
             aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content bg-danger">
                     <div class="modal-header">
-                        <h5 class="modal-title">Delete Branch</h5>
+                        <h5 class="modal-title">Delete User</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -227,7 +215,7 @@
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" name='cmd' value="deleteBranch" class="btn btn-primary" id="DeleteModalBtn">Delete</button>
+                        <button type="submit" name='cmd' value="deleteUser" class="btn btn-primary" id="DeleteModalBtn">Delete</button>
                     </div>
                 </div>
             </div>
@@ -236,6 +224,6 @@
 </asp:Content>
 <asp:Content ContentPlaceHolderID="AdditionalJS" runat="server">
 
-    <script src="src/js/Branch.js"></script>
+    <script src="src/js/app_user.js"></script>
 
 </asp:Content>

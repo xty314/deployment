@@ -30,7 +30,11 @@ public partial class database : AdminBasePage
         {
             DeleteDatabase();
         }
-     
+        if (Request.Form["backupDb"] != null && Request.Form["backupDb"] != "")
+        {
+            BackupDatabase();
+        }
+
         LoadDatabaseList();
     }
 
@@ -69,12 +73,11 @@ public partial class database : AdminBasePage
             string database = Common.GetDatabase(dr["conn_str"].ToString());
             //step 1 backup database
             //todo   
-            //if (backup == "1")
-            //{
-            //    string backupPath = Common.GetSetting("BACKUP_DIR_PATH") + database + ".bak";
-            //    sc = String.Format("Backup Database {0} To disk = '{1}' WITH INIT", database, backupPath);
-            //    dbhelper.ExecuteNonQuery(sc);
-            //}
+            if (backup == "1")
+            {
+                Backup(database);
+       
+            }
             //step 2 delete database
             if (deleteDb == "1")
             {
@@ -161,7 +164,12 @@ public partial class database : AdminBasePage
        
         Common.Refresh();
     }
+    private void BackupDatabase()
+    {
+        string database = Request.Form["backupDb"];
+        info= Backup(database);
 
+    }
     private void CreateNewDatabase()
     {
         //step 1
@@ -228,7 +236,6 @@ public partial class database : AdminBasePage
 
 
 
-
         SqlParameter[] parameters =
         {
            new SqlParameter("@name", name),
@@ -249,7 +256,7 @@ public partial class database : AdminBasePage
 	                                        [upload_date] [datetime] NULL,
 	                                        [description] [ntext] NOT NULL,
 	                                        [location] [nvarchar](max) NULL,
-                                            [executer] [int] NULL,
+                                            [executor] [int] NULL,
                                             [record_id] [int] NULL,
 	                                        [execute_date] [datetime] NULL CONSTRAINT [DF_script_execute_date]  DEFAULT (getdate())
                                         ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]";
@@ -270,7 +277,16 @@ public partial class database : AdminBasePage
 
       Common.Refresh();
     }
-
+    private string Backup(string database)
+    {
+        DateTime currentTime = DateTime.Now;
+        string backupPath = Common.GetSetting("db_backup_location");
+        string bakName = database + "_" + currentTime.ToString("yyyyMMddHHmmss") + ".bak";
+        backupPath = Path.Combine(backupPath, bakName);
+        string sc = String.Format("Backup Database {0} To disk = '{1}' WITH INIT", database, backupPath);
+        dbhelper.ExecuteNonQuery(sc);
+        return string.Format("Backup successfully, please go to {0} to check file {1}", Common.GetSetting("db_server"), backupPath);
+    }
     private void LoadDatabaseList()
     {
         string origin = Request.QueryString["origin"];

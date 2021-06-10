@@ -32,6 +32,8 @@
     <!--scrollbars-->  
 <link rel="stylesheet" href="/src/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
 <link href="/src/plugins/bs-table/bootstrap-table.min.css" rel="stylesheet" />
+<!-- SweetAlert2 -->
+<link href="./src/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css" rel="stylesheet" />
    <!--common.css-->
   
 <link href="/src/css/common.css" rel="stylesheet" />

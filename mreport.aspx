@@ -1,9 +1,5 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="repository.aspx.cs" Inherits="repository" MasterPageFile="./master/_layout.master" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="mreport.aspx.cs" Inherits="mreport"  MasterPageFile="./master/_layout.master"%>
 
-
-
-
-<%--import MasterPageFile--%>
 
 
 <%@Import Namespace="System.Data.SqlClient" %>
@@ -18,12 +14,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Github Repository</h1>
+            <h1>Mreport</h1>
           </div>
          <div class="col-sm-6">
                     <div class="float-right">
                         <button class="btn bg-blue" data-toggle="modal" data-target="#NewModal"><i
-                                class="fa fa-pen"></i> Add New Repo</button>
+                                class="fa fa-pen"></i> Add New Mreport</button>
                          <%--<button class="btn bg-blue" data-toggle="modal" data-target="#NewCompanyModal"><i
                                 class="fa fa-pen"></i>Update </button>--%>
                         <%-- <button type="button" class="btn btn-success"><i class="fa fa-download"></i>Export </button>--%>
@@ -54,20 +50,18 @@
             <table class="table table-striped table-hover projects">
                     <thead>
                         <tr>
-                            <th style="width: 1%">
-                                #id
-                            </th>
+                       
                             <th style="width: 15%">
-                                Repo Name
+                               Name
                             </th>
                                <th style="width: 30%">
-                                Repo
+                                Url
                             </th>
                             <th >
-                                Description
+                                App
                             </th>
-                            <th class="text-center" >
-                               Private
+                            <th >
+                               description
                             </th>
 
                             <th class="text-right">
@@ -76,42 +70,34 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <%foreach (DataRow dr in  repoDataTable.Rows)
+                        <%foreach (DataRow dr in  mreportDatatable.Rows)
                             {%>
                          <tr>
-                            <td>
-                                #<%=dr["id"]%>
-                            </td>
+                      
                             <td>
                                
-                                    <%=dr["name"] %>
+                                    <%=dr["name"].ToString() %>
+                            </td>   
+                                <td>
                                
-                               
-                            </td>
-                                  <td>
-                                <a>
-                                    <%=dr["url"] %>
-                                </a>
-                               
-                            </td>
+                                    http://mreport.gpos.nz/m/<%=dr["name"]%>
+                            </td>   
                             <td>
-                                    <%=dr["description"] %>
-                            </td>
-                            <td class="project_progress  text-center">
-                                <%=dr["private"] %>             
-                            </td>
-
+                                   <%=dr["app"]%>
+                            </td>   
+                              <td>
+                                   <%=dr["description"]%>
+                            </td> 
                             <td class="project-actions text-right">
                             
                    
                                 
                                 <a class="btn btn-info btn-sm edit-btn" href="#" 
                                         data-toggle="modal" data-target="#EditModal"
-                                         data-id=<%=dr["id"]%>
-                                        data-name="<%=dr["name"] %>"
-                                    data-description="<%=dr["description"] %>"
-                                    data-private="<%=dr["private"] %>"
-                                      data-url="<%=dr["url"] %>"
+                                        data-id="<%=dr["id"] %>"
+                                     data-description="<%=dr["description"] %>"
+                                     data-app="<%=dr["app_id"] %>"
+                                     data-name="<%=dr["name"] %>"
                
                                         >
                                     <i class="fas fa-pencil-alt">
@@ -121,9 +107,7 @@
                              
                                   <a class="btn btn-danger btn-sm delete-btn" href="#" 
                                         data-toggle="modal" data-target="#DeleteModal"
-                                       data-name="<%=dr["name"] %>"
-                                       data-id=<%=dr["id"]%>
-                     
+                              data-id="<%=dr["id"] %>"
                                       >
                                     <i class="fas fa-trash">
                                     </i>
@@ -157,23 +141,16 @@
                     <div class="modal-body">
 
                         <div class="form-group row">
-                            <label for="recipient-name" class="col-form-label col-sm-4">Repo Name:</label>
+                            <label for="recipient-name" class="col-form-label col-sm-4">Mrepot Name:</label>
                             <input type="text" class="form-control  col-sm-8" name='name'>
                         </div>
-                        <div class="form-group row">
-                            <label for="recipient-name" class="col-form-label col-sm-4">URL:</label>
-                            <input type="text" class="form-control  col-sm-8" name='url'  />
-                        </div>
+                  <%=PrintAppList() %>
                    
                      <div class="form-group row">
                         <label class="col-form-label col-sm-4">Description</label>
                         <textarea class="form-control col-sm-8" rows="3" name ="description" placeholder="Description ..." style="margin-top: 0px; margin-bottom: 0px; height: 105px;"></textarea>
                       </div>
-                            <div class="form-group row"">
-                             <label class="col-form-label col-sm-4" for="privateCheck">Private</label>
-                            <input type="checkbox" class="form-control form-control-sm col-sm-1" name="private" id="privateCheck" value=1>
-                           
-                        </div>
+                      
                      
                     </div>
                     <div class="modal-footer">
@@ -190,7 +167,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Eidt Repo</h5>
+                        <h5 class="modal-title">Eidt Mreport</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -198,24 +175,16 @@
                     <div class="modal-body">
                          <input type="hidden" class="form-control  col-sm-8" name='id' />
                  
-                          <div class="form-group row">
-                            <label for="recipient-name" class="col-form-label col-sm-4">Repo Name:</label>
+                                   <div class="form-group row">
+                            <label for="recipient-name" class="col-form-label col-sm-4">Mrepot Name:</label>
                             <input type="text" class="form-control  col-sm-8" name='name'>
                         </div>
-                        <div class="form-group row">
-                            <label for="recipient-name" class="col-form-label col-sm-4">URL:</label>
-                            <input type="text" class="form-control  col-sm-8" name='url'  />
-                        </div>
+                    <%=PrintAppList() %>
                    
                      <div class="form-group row">
                         <label class="col-form-label col-sm-4">Description</label>
                         <textarea class="form-control col-sm-8" rows="3" name ="description" placeholder="Description ..." style="margin-top: 0px; margin-bottom: 0px; height: 105px;"></textarea>
                       </div>
-                            <div class="form-group row"">
-                             <label class="col-form-label col-sm-4" for="privateCheck">Private</label>
-                            <input type="checkbox" class="form-control form-control-sm col-sm-1" name="private" id="privateCheck" value=1>
-                           
-                        </div>
                     
                     </div>
                     <div class="modal-footer">
@@ -232,7 +201,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content bg-danger">
                     <div class="modal-header">
-                        <h5 class="modal-title">Delete Repo</h5>
+                        <h5 class="modal-title">Delete Mreport</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -259,6 +228,6 @@
  <!-- /.content -->
 </asp:Content>
 <asp:Content ContentPlaceHolderId="AdditionalJS" runat="server">
-     <script src="src/js/repository.js"></script>
- 
+    <script src="src/js/mreport.js"></script>
+
 </asp:Content>

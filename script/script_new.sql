@@ -1,1 +1,0 @@
-select * from code_relations

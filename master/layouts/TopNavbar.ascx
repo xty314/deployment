@@ -7,9 +7,7 @@
         <li class="nav-item">
             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
         </li>
-        <li class="nav-item d-none d-sm-inline-block">
-            <a href="http://mreport.gpos.nz/admin" target="_blank" class="nav-link">MReport</a>
-        </li>
+
         <li class="nav-item d-none d-sm-inline-block">
             <a href="http://adv.gcloud.co.nz/adv/admin/"  target="_blank" class="nav-link">Adv</a>
         </li>

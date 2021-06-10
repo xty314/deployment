@@ -208,8 +208,17 @@ public partial class script : AdminBasePage
         string sc = "SELECT location FROM script where id=" + id;
         string scriptPath = (string)dbhelper.ExecuteScalar(sc);
         string content = "";
-        content = File.ReadAllText(scriptPath);
-        return content;
+        try
+        {
+            content = File.ReadAllText(scriptPath);
+            return content;
+        }catch(Exception e)
+        {
+            info = e.Message;
+            return e.Message;
+        }
+    
+      
 
     }
     public void DownloadScript()

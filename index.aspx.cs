@@ -26,7 +26,7 @@ public partial class v2_login : Page
             if (isExistEmail == 0)
             {
                 m_msg = "Email does not exist";
-                Response.StatusCode = 404;
+                //Response.StatusCode = 404;
                 return;
             }
             sql = "SELECT ISNULL((SELECT top(1) id FROM card WHERE email=@email and password=@password), 0)";
@@ -39,8 +39,9 @@ public partial class v2_login : Page
             if (userId == 0)
             {
                 m_msg = "Password is not correct";
-                m_msg = md5Pass;
-                Response.StatusCode = 404;
+            
+                //Response.StatusCode = 404;
+                //Response.Redirect("index.aspx");
                 return;
             }
             else

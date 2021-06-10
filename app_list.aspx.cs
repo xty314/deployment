@@ -1,4 +1,5 @@
 ﻿using LibGit2Sharp;
+using LibGit2Sharp.Handlers;
 using Microsoft.Web.Administration;
 using Newtonsoft.Json;
 using System;
@@ -20,6 +21,11 @@ public partial class app_list : AdminBasePage
     public string info = "";
     protected void Page_Load(object sender, EventArgs e)
     {
+        string checkId = Request.QueryString["check"];
+        if (!String.IsNullOrEmpty(checkId) && Common.IsNumberic(checkId))//check if modified
+        {
+            CheckApp();
+        }
         if (Request.Form["cmd"] == "new")// create new app
         {
             CreateApp();
@@ -35,13 +41,93 @@ public partial class app_list : AdminBasePage
         {
             DeleteApp();
         }
-        else if (Request.Form["cmd"] == "edit")//delete app
+        else if (Request.Form["cmd"] == "edit")//eidt app
         {
             EditApp();
         }
+        else if (Request.Form["cmd"] == "pull")//update app, pull code from github
+        {
+            PullFromGithub();
+        }
+     
         LoadAppList();
     }
 
+    private void CheckApp()
+    {
+     
+        string id = Request.QueryString["check"];
+
+        string path = (string)dbhelper.ExecuteScalar("SELECT location from web_app where id=" + id);
+        string name = (string)dbhelper.ExecuteScalar("SELECT name from web_app where id=" + id);
+        path = Path.GetFullPath(path);
+      
+        
+        using (var repo = new Repository(path))
+        {
+            var changes = repo.Diff.Compare<TreeChanges>();
+            if (changes.Count > 0)
+            {
+                info = "The following files are changed in app "+name+".<br>";
+                foreach (TreeEntryChanges c in changes)
+                {
+                    //Console.WriteLine(c);
+                    info += string.Format("File:{0} exist({1}) status({2})<br>", c.Path ,c.Exists,c.Status);
+                }
+
+            }
+            else
+            {
+                info =String.Format( "No changes in {0}.",name);
+            }
+            
+        }
+    }
+
+    private void PullFromGithub()
+    {
+        string id = Request.Form["id"].ToString().Trim();
+        string userName = Request.Form["gitname"].ToString().Trim();
+        string password = Request.Form["gitpass"].ToString().Trim();
+        string path = (string)dbhelper.ExecuteScalar("SELECT location from web_app where id=" + id);
+        path = Path.GetFullPath(path);
+        try
+        {
+            using (Repository repo = new Repository(path))
+            {
+                // Credential information to fetch
+                LibGit2Sharp.PullOptions options = new LibGit2Sharp.PullOptions();
+                options.FetchOptions = new FetchOptions();
+                options.FetchOptions.CredentialsProvider = new CredentialsHandler(
+                    (url, usernameFromUrl, types) =>
+                        new UsernamePasswordCredentials()
+                        {
+                            Username = userName,
+                            Password = password
+                        });
+
+                // User information to create a merge commit
+                var signature = new LibGit2Sharp.Signature(
+                    new Identity(userName, "support@eznz.com"), DateTimeOffset.Now);
+
+                // Pull
+                MergeResult result = Commands.Pull(repo, signature, options);
+                info = result.Status.ToString();
+                
+            }
+
+            string sc = "UPDATE web_app SET last_update_date=GETDATE() WHERE id=" + id;
+            dbhelper.ExecuteNonQuery(sc);
+
+        }
+        catch (Exception e)
+        {
+            info = e.Message;
+            return;
+        }
+
+
+    }
     private void EditApp()
     {
         int removable = string.IsNullOrEmpty(Request.Form["removable"]) ? 0 : 1;
@@ -112,6 +198,17 @@ public partial class app_list : AdminBasePage
             info = "This app can not be removed.";
             return;
         }
+        if ((int)dr["repo_id"]<=0||string.IsNullOrEmpty(dr["location"].ToString()))
+        {
+            deleteFile = false;
+            string sql = "SELECT count(*) from mreport where app_id=" + app_id;
+            int count = (int)dbhelper.ExecuteScalar(sql);
+            if (count > 0)
+            {
+                info = "This app is occupied by mreport, please delete mreport first and try again.";
+                return;
+            }
+        }
         try
         {
             if (deleteFile)
@@ -121,8 +218,6 @@ public partial class app_list : AdminBasePage
                 {
                     DeleteDirectory(Path.GetFullPath(dr["location"].ToString()));
                 }
-
-
             }
          
             sc = "DELETE FROM web_app where id=" + app_id;
@@ -145,7 +240,7 @@ public partial class app_list : AdminBasePage
     /// </summary>
     private void DeployApp()
     {
-        string url = Request.Form["url"];
+        string url = Request.Form["url"].ToString().Trim();
         string app_id = Request.Form["id"];
         string sc = "SELECT top 1 * from web_app where id=" + app_id;
         DataTable dt = dbhelper.ExecuteDataTable(sc);
@@ -196,91 +291,123 @@ public partial class app_list : AdminBasePage
         string db= Request.Form["db"];
      
         string location = Path.GetFullPath(Request.Form["location"].ToString());
-        if (string.IsNullOrEmpty(location))
+        if (Convert.ToInt32(repo) > 0)//greater than 0 means choose one valid github repo
         {
-            location = Path.GetFullPath(Common.GetSetting("app_install_location"));
-        }
-        string sc = "SELECT * FROM git_repository WHERE id=" + repo;
-        DataTable repoDt = dbhelper.ExecuteDataTable(sc);
-        string directoryPath = Path.Combine(location, name);//location + "\\\\" + name;
-  
-        if (!Directory.Exists(directoryPath))
-        {
-            Directory.CreateDirectory(directoryPath);
-        }
-        else
-        {
-            info = "App directory exists, please change a name.";
-            return;
-        }
-        if (repoDt.Rows.Count == 1)
-        {
-
-            DataRow dr = repoDt.Rows[0];
-
-            Response.Clear();
-            Response.Write("Download Starting...");
-            Response.Flush();
-            try
+            if (string.IsNullOrEmpty(location))
             {
-                if (!(bool)dr["private"])
-                {
-                    //public  git repo no password
-                    Repository.Clone(dr["url"].ToString(), directoryPath);//x64
+                location = Path.GetFullPath(Common.GetSetting("app_install_location"));
+            }
+            string sc = "SELECT * FROM git_repository WHERE id=" + repo;
+            DataTable repoDt = dbhelper.ExecuteDataTable(sc);
+            string directoryPath = Path.Combine(location, name);//location + "\\\\" + name;
 
-                }
-                else
-                {
-                  
-
-                    CloneOptions options = new CloneOptions
-                    {
-                        CredentialsProvider = (_url, _user, _cred) => new UsernamePasswordCredentials
-                        {
-                            Username = username,
-                            Password = password
-                        },
-                    };
-
-                    //private git repo need user name and password
-                    Repository.Clone(dr["url"].ToString(), directoryPath, options);//x64
-                }
-            }catch(Exception e)
+            if (!Directory.Exists(directoryPath))
             {
-                DirectoryInfo di = new DirectoryInfo(directoryPath);
-                di.Delete();//如果出错就删除创建的文件夹
-                info = e.Message;
+                Directory.CreateDirectory(directoryPath);
+            }
+            else
+            {
+                info = "App directory exists, please change a name.";
                 return;
             }
-            Response.Write("Download Fininshed.");
-            Response.Write("Record into databaset Starting.");
-            Response.Flush();
-            //step2: insert into database
-            sc = "INSERT into web_app (name,location,db_id,repo_id,creator,description) VALUES(@name,@location,@db_id,@repo_id,@creator,@description) ";
+            if (repoDt.Rows.Count == 1)
+            {
+
+                DataRow dr = repoDt.Rows[0];
+                Response.Clear();
+                Response.Write("<h1>Download Starting...</h1>");
+                Response.Write("<h1>Please do not close the page, it will spend several minutes to download files...</h1>");
+                Response.Flush();
+                try
+                {
+                    if (!(bool)dr["private"])
+                    {
+                        //public  git repo no password
+                        Repository.Clone(dr["url"].ToString(), directoryPath);//x64
+
+                    }
+                    else
+                    {
+                        CloneOptions options = new CloneOptions
+                        {
+                            CredentialsProvider = (_url, _user, _cred) => new UsernamePasswordCredentials
+                            {
+                                Username = username,
+                                Password = password
+                            },
+                        };
+
+                        //private git repo need user name and password
+                        Repository.Clone(dr["url"].ToString(), directoryPath, options);//x64
+                    }
+                }
+                catch (Exception e)
+                {
+                    DirectoryInfo di = new DirectoryInfo(directoryPath);
+                    di.Delete();//如果出错就删除创建的文件夹
+                    info = e.Message;
+                    return;
+                }
+                Response.Write("Download Fininshed.");
+                Response.Write("Record into databaset Starting.");
+                Response.Flush();
+                //step2: insert into database
+                sc = "INSERT into web_app (name,location,db_id,repo_id,creator,description) VALUES(@name,@location,@db_id,@repo_id,@creator,@description) ";
+                SqlParameter[] sqlParameters =
+                {
+                    new SqlParameter("@name",name),
+                    new SqlParameter("@location",directoryPath),
+                    new SqlParameter("@db_id",db),
+                    new SqlParameter("@repo_id",repo),
+                    new SqlParameter("@creator",(int)Session["user_id"]),
+                    new SqlParameter("@description", description)
+                };
+                dbhelper.ExecuteNonQuery(sc, sqlParameters);
+                Response.Write("Record into databaset Finished.");
+                Response.Flush();
+                Common.Refresh();
+                //step3:create appSettings.json for add connecting to the database
+                CreateOrEditAppSettingsJsonFile(directoryPath, Convert.ToInt32(db));
+            }
+        }
+        else{
+            //repo<0 means one empty app
+           string sc = "INSERT into web_app (name,location,db_id,repo_id,creator,description) VALUES(@name,'',@db_id,@repo_id,@creator,@description) ";
             SqlParameter[] sqlParameters =
             {
-                  new SqlParameter("@name",name),
-                new SqlParameter("@location",directoryPath),
-                new SqlParameter("@db_id",db),
-                new SqlParameter("@repo_id",repo),
-                 new SqlParameter("@creator",(int)Session["user_id"]),
-                  new SqlParameter("@description", description)
-            };
+                    new SqlParameter("@name",name),
+                    new SqlParameter("@db_id",db),
+                    new SqlParameter("@repo_id",repo),
+                    new SqlParameter("@creator",(int)Session["user_id"]),
+                    new SqlParameter("@description", description)
+                };
             dbhelper.ExecuteNonQuery(sc, sqlParameters);
-            Response.Write("Record into databaset Finished.");
-            Response.Flush();
-            Common.Refresh();
-            //step3:create appSettings.json for add connecting to the database
-            CreateOrEditAppSettingsJsonFile(directoryPath, Convert.ToInt32(db));
         }
+       
         
     }
 
     public void LoadAppList()
     {
-        string sc = @"SELECT wa.*,db.name as 'db_name',gr.name as 'repo_name' from web_app wa 
+        string repo = Request.QueryString["repo"];
+        string sc = "";
+        if (string.IsNullOrEmpty(repo))
+        {
+            sc = @"SELECT wa.*,db.conn_str,db.name as 'db_name',gr.name as 'repo_name',mp.url as 'mreport_url' from web_app wa 
                 left join db_list db on wa.db_id=db.id 
-                left join git_repository gr on wa.repo_id=gr.id ";
+                left join git_repository gr on wa.repo_id=gr.id 
+                left join mreport mp on mp.app_id=wa.id
+                order by repo_id,id desc";
+
+        }
+        else{
+            sc = @"SELECT wa.*,db.conn_str,db.name as 'db_name',gr.name as 'repo_name',mp.url as 'mreport_url' from web_app wa 
+                left join db_list db on wa.db_id=db.id 
+                left join git_repository gr on wa.repo_id=gr.id 
+                left join mreport mp on mp.app_id=wa.id
+                where wa.repo_id=" + repo;
+        }
+      
         appDataTable = dbhelper.ExecuteDataTable(sc);
 
 
@@ -300,7 +427,8 @@ public partial class app_list : AdminBasePage
         {
             sb.Append(String.Format("<option value={0} data-private={1}>{2}</option>",dr["id"], dr["private"], dr["name"]));
         }
-
+   
+        sb.Append("<option value='0'  >Not from Github</option>");
         sb.Append("</select>");
         sb.Append("</div>");
 
@@ -448,5 +576,35 @@ public partial class app_list : AdminBasePage
         File.SetAttributes(directoryPath, FileAttributes.Normal);
 
         Directory.Delete(directoryPath, false);
+    }
+    public string PrintRepoListHeader()
+    {
+        StringBuilder sb = new StringBuilder();
+
+        sb.Append("<select class='form-control col-sm-4' name='install_db_id' onchange='window.location.href=\"?repo=\"+this.value'>");
+        sb.Append("<option value='' >All</option>");
+ 
+        string sc = "SELECT * FROM git_repository where del=0 order by id ";
+        DataTable dt = dbhelper.ExecuteDataTable(sc);
+        foreach (DataRow dr in dt.Rows)
+        {
+            sb.Append("<option ");
+            if (Request.QueryString["repo"] == dr["id"].ToString())
+            {
+                sb.Append(" selected ");
+            }
+            sb.Append(String.Format(" value ={0} >{1}</ option > ", dr["id"], dr["name"]));
+        }
+        sb.Append("<option value='0' ");
+        if (Request.QueryString["repo"] == "0")
+        {
+            sb.Append(" selected ");
+        }
+        sb.Append(" >Not from Github</option>");
+        sb.Append("</select>");
+
+
+        return sb.ToString();
+        //
     }
 }

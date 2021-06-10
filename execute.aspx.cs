@@ -60,7 +60,7 @@ public partial class execute : AdminBasePage
         else
         {
             //false for install_db.aspx  run script for the indicated install db
-            cmd = "SELECT id,conn_str,1 as is_install  from install_db where  in ('" + string.Join("','", dbIds) + "')";
+            cmd = "SELECT id,conn_str,1 as is_install  from install_db where id  in ('" + string.Join("','", dbIds) + "')";
         }
        
 
@@ -146,8 +146,8 @@ public partial class execute : AdminBasePage
 
 
                     //run script successfully following record.
-                   sql = " insert into script (id,name,uploader,upload_date,description,location,executer,record_id) values (@id,@name,@uploader,@upload_date,@description,@location,@executer,@record_id) ";
-                    int executer = (int)Session["user_id"];
+                   sql = " insert into script (id,name,uploader,upload_date,description,location,executor,record_id) values (@id,@name,@uploader,@upload_date,@description,@location,@executor,@record_id) ";
+                    int executor = (int)Session["user_id"];
                     SqlParameter[] sqlParameters = {
                         new SqlParameter("@id",scriptDr["id"].ToString()),
                         new SqlParameter("@name",scriptDr["name"].ToString()),
@@ -155,13 +155,20 @@ public partial class execute : AdminBasePage
                          new SqlParameter("@upload_date",scriptDr["upload_date"].ToString()),
                         new SqlParameter("@description",scriptDr["description"].ToString()),
                         new SqlParameter("@location",scriptDr["location"].ToString()),
-                        new SqlParameter("@executer",executer),
+                        new SqlParameter("@executor",executor),
                         new SqlParameter("@record_id",scriptRecordId),
                     };
                     tenantDbHelper.ExecuteNonQuery(sql, sqlParameters);
                 }
                 Response.Write(String.Format("<h1>Database:{0} excuted {1} scripts.</h1>", Common.GetDatabase(conn_str), scriptIds.Length));
                 Response.Flush();
+                if (dr["is_install"].ToString() == "1")
+                {
+                    Common.UpdateInstallDbBak(Convert.ToInt32(dr["id"].ToString()));
+                    Response.Write(String.Format("<h1>Update install db bak file.</h1>"));
+                    Response.Flush();
+                }
+              
 
             }
 

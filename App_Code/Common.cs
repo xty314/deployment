@@ -192,6 +192,25 @@ public class Common
      
         return result;
     }
+    public static bool UpdateInstallDbBak(int install_db_id)
+    {
+        try
+        {
+            DBhelper dbhelper = new DBhelper();
+            string path = Path.GetFullPath((string)dbhelper.ExecuteScalar("SELECT location FROM install_db where id=" + install_db_id));//这个地址是指数据库服务器的路径，不是app server
+            string conn_str = (string)dbhelper.ExecuteScalar("SELECT conn_str FROM install_db where id=" + install_db_id);
+            string database = Common.GetDatabase(conn_str);
+            string sc = String.Format("Backup Database {0} To disk = '{1}' WITH INIT", database, path);
+            dbhelper.ExecuteNonQuery(sc);
+            sc = " UPDATE install_db set last_update_date=GETDATE() where id=" + install_db_id;
+            dbhelper.ExecuteNonQuery(sc);
+            return true;
+        }catch(Exception e)
+        {
+            return false;
+        }
+      
+    }
 }
 
 

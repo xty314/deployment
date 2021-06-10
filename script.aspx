@@ -23,9 +23,7 @@
                                 class="fa fa-pen"></i> Create Script</button>
                         <button class="btn bg-blue" data-toggle="modal" data-target="#UploadModal"><i
                                 class="fa fa-file"></i> Upload Script</button>
-                         <%--<button class="btn bg-blue" data-toggle="modal" data-target="#NewCompanyModal"><i
-                                class="fa fa-pen"></i>Update </button>--%>
-                        <%-- <button type="button" class="btn btn-success"><i class="fa fa-download"></i>Export </button>--%>
+                
                     </div>
                 </div>
         </div>
@@ -76,7 +74,7 @@
                               <th class="text-center" >
                               Upload Date
                             </th>
-                              <%if (string.IsNullOrEmpty(Request.QueryString["db"])){%>
+                              <%if (string.IsNullOrEmpty(Request.QueryString["db"])&&string.IsNullOrEmpty(Request.QueryString["origin"])){%>
                             <th class="text-right">
                                 Action
                             </th>
@@ -103,7 +101,7 @@
                                  <td class="project_progress  text-center">
                                      <%=dr["upload_date"] %>          
                             </td>
-                             <%if (string.IsNullOrEmpty(Request.QueryString["db"])){%>
+                             <%if (string.IsNullOrEmpty(Request.QueryString["db"])&&string.IsNullOrEmpty(Request.QueryString["origin"])){%>
                              <td class="project-actions text-right">
                                  <div class="btn-group">
                                      <button type="button" class="btn btn-primary  btn-sm dropdown-toggle dropdown-icon" data-toggle="dropdown">

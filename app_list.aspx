@@ -13,8 +13,9 @@
     <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>Web App</h1>
+                <div class="col-sm-6 row">
+                    <h1 class="mr-5">Web App</h1>
+                    <%=PrintRepoListHeader() %>
                 </div>
                 <div class="col-sm-6">
                     <div class="float-right">
@@ -53,20 +54,19 @@
                         <tr>
                             <th style="width: 1%">#id
                             </th>
-                            <th>App Name
+                            <th style="width: 4%">App Name
                             </th>
 
-                            <th>Description
+                            <th style="width: 10%">Description
                             </th>
-                            <th>Url
+                         
+                            <th style="width: 10%">Database
                             </th>
-                            <th>Database
+                            <th style="width: 30%">URL
                             </th>
-                            <th>Api
+                            <th style="width: 15%">Last Update Date
                             </th>
-                            <th class="text-center">Last Update Date
-                            </th>
-                            <th style="width: 35%" class="text-right">Action
+                            <th style="width: 40%" class="text-right">Action
                             </th>
                         </tr>
                     </thead>
@@ -78,21 +78,35 @@
                             </td>
                             <td>
 
-                                <%=dr["name"] %><br />
+                                   <a href="http://<%=dr["url"] %>" target="_blank">
+                                <%=dr["name"] %></a><br />
                                 <small><%=dr["location"] %></small>
 
                             </td>
                             <td>
                                 <%=dr["description"] %>
                             </td>
+                
                             <td>
-                                <%=dr["url"] %>
+                                <%=dr["db_name"] %><br />
+                                 <small><%=Common.GetServer(dr["conn_str"].ToString()) %></small>
                             </td>
-                            <td>
-                                <%=dr["db_name"] %>
-                            </td>
-                            <td>
-                                <!--%=string.Format(Common.GetSetting("cloud_sync_api"),dr["id"]) %--> 
+                            <td> 
+                                <%if ((bool)dr["deploy"])
+                                     { %>
+                               <small>Cloud URL: <span>http://<%=dr["url"] %></span>
+                                    <button type="button" class="btn btn-default btn-sm copy-btn"><i class="far fa-copy"></i> Copy</button>
+                               </small><br />
+                                <%} %>
+                               <small> SYNC API: <span><%=string.Format(Common.GetSetting("cloud_sync_api"),dr["id"]) %></span> 
+                                   <button type="button" class="btn btn-default btn-sm copy-btn"><i class="far fa-copy"></i> Copy</button>
+                               </small><br />
+                                   <%if (!string.IsNullOrEmpty(dr["mreport_url"].ToString()))
+                                     { %>
+                               <small>Mreport: <a href="<%=dr["mreport_url"] %>" target="_blank"><%=dr["mreport_url"] %></a>
+                                    <button type="button" class="btn btn-default btn-sm copy-btn"><i class="far fa-copy"></i> Copy</button>
+                               </small><br />
+                                <%} %>
 
                             </td>
                             <td>
@@ -100,33 +114,47 @@
                             </td>
 
                             <td class="project-actions text-right">
+                                <div class="btn-group ml-1 mb-1">
+                                <button type="button" class="btn btn-primary  btn-sm dropdown-toggle dropdown-icon" data-toggle="dropdown">
+                                    Action
+                                </button>
+                                <div class="dropdown-menu" role="menu">
+                                    <a class="dropdown-item" href="./app_user.aspx?id=<%=dr["id"]%>"><i class="fas fa-user"></i>USER</a>
+                                    <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="./app_branch.aspx?id=<%=dr["id"]%>"><i class="fas fa-building"></i>BRANCH</a>
+                                    </div>
+                                </div>
 
-
-                                <a class="btn btn-warning btn-sm edit-btn" href="#">
-                                    <i class="fas fa-plus-circle"></i>Update
+                              <%if((int)dr["repo_id"]>0){ %>
+                                <a class="btn btn-warning btn-sm pull-btn ml-1 mb-1" href="#"
+                                   data-toggle="modal" data-target="#PullModal"
+                                    data-id="<%=dr["id"] %>""
+                                   >
+                                    <i class="fas fa-plus-circle"></i>
+                                    Update
                                 </a>
-                                <a class="btn btn-danger btn-sm edit-btn" href="#">
-                                    <i class="fas fa-history"></i>Customize Check
+                                <a class="btn btn-danger btn-sm edit-btn ml-1 mb-1" href="?check=<%=dr["id"] %>">
+                                    <i class="fas fa-history"></i>
+                                    Modify Check
                                 </a>
-
-                                 <%--deploy button or unbind button--%>
+                                 
                                 <%if (dr["deploy"].ToString().ToLower() == "false")
                                     { %>
-                                <a class="btn btn-primary btn-sm deploy-btn"
+                                <a class="btn btn-primary btn-sm deploy-btn ml-1 mb-1"
                                     data-toggle="modal" data-target="#DeployModal"
                                     data-id="<%=dr["id"] %>">
-                                    <i class="fas fa-upload"></i>Deploy
+                                    <i class="fas fa-upload"></i>
+                                    Deploy
                                 </a><%}
-                                        else
-                                        { %>
-                                <a class="btn bg-indigo btn-sm unbind-btn" href="#"
+                                else
+                                { %>
+                                <a class="btn bg-indigo btn-sm unbind-btn ml-1 mb-1" href="#"
                                     data-toggle="modal" data-target="#UnbindModal" data-id='<%=dr["id"]%>'>
                                     <i class="fas fa-link"></i>
                                     Unbind IIS
                                 </a>
-                                <%} %>
-                                 <%--eidt button--%>
-                                <a class="btn btn-info btn-sm edit-btn" href="#"
+                                <%} } %>
+                                <a class="btn btn-info btn-sm edit-btn ml-1 mb-1" href="#"
                                     data-toggle="modal" data-target="#EditModal"
                                     data-id='<%=dr["id"]%>'
                                     data-name="<%=dr["name"] %>"
@@ -138,12 +166,13 @@
                                     EDIT
                                 </a>
 
-                                <%--delete button--%>
+                         
                                  <%if ((bool)dr["removable"]){ %>
-                                  <a class="btn btn-danger btn-sm delete-btn" href="#" 
+                                  <a class="btn btn-danger btn-sm delete-btn ml-1 mb-1" href="#" 
                                         data-toggle="modal" data-target="#DeleteModal"
                                         data-name='<%=dr["name"]%>'
                                        data-id='<%=dr["id"]%>'
+                                      data-repo='<%=dr["repo_id"]%>'
                                        data-location='<%=dr["location"]%>'
                                       >
                                     <i class="fas fa-trash">
@@ -320,8 +349,8 @@
                         </div>
                 
                         <div class="form-check">
-                            <input type="checkbox" class="form-check-input form-check-input-lg" name="deleteFile" id="backupCheck" value="1" checked>
-                            <label class="form-check-label" for="backupCheck">Delete the directory <span id="deleteFileLocation">E:\\webhost\\royal</span></label>
+                            <input type="checkbox" class="form-check-input form-check-input-lg" name="deleteFile" id="deleteCheck" value="1" checked>
+                            <label class="form-check-label" for="deleteCheck">Delete the directory <span id="deleteFileLocation"></span></label>
                         </div>
 
                     </div>
@@ -329,6 +358,37 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button type="submit" name='cmd' value="delete" class="btn btn-primary" id="DeleteModalBtn">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+     <form method="post" id='PullForm'>
+        <div class="modal fade" id="PullModal" tabindex="-1" role="dialog"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" >Update App</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                       <input type="hidden" class="form-control  col-sm-8" name='id' />
+                        <div class="form-group row private_info">
+                            <label for="recipient-name" class="col-form-label col-sm-4">Git User Name:</label>
+                            <input type="text" class="form-control  col-sm-8" name='gitname'>
+                        </div>
+                        <div class="form-group row private_info">
+                            <label for="recipient-name" class="col-form-label col-sm-4">Git Password:</label>
+                            <input type="password" class="form-control  col-sm-8" name='gitpass' />
+                        </div>
+               
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" name='cmd' value='pull' class="btn btn-primary">Save</button>
                     </div>
                 </div>
             </div>

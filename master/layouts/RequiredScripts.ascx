@@ -8,7 +8,8 @@
 <%--<script src="/src/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>--%>
 <!-- Bootstrap4 Duallistbox -->
 <script src="/src/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
-
+<!-- SweetAlert2 -->
+<script src="/src/plugins/sweetalert2/sweetalert2.min.js"></script>
 <!-- Bootstrap table -->
 <%--   <script src="/src/plugins/bootstrap-table/bootstrap-table.min.js"></script>--%>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
