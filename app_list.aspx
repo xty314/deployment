@@ -49,12 +49,19 @@
         <div class="card">
          
             <div class="card-body p-0" style="display: block;">
-                <table class="table table-striped table-hover projects">
+                <table 
+                    class="table table-striped table-hover"
+                      id="table"
+              data-toggle="table"
+                     data-search="true"
+                      data-sortable="true"
+                      
+                     >
                     <thead>
                         <tr>
-                            <th style="width: 1%">#id
+                            <th data-field="id" data-sortable="true" style="width: 1%">#id
                             </th>
-                            <th style="width: 4%">App Name
+                            <th data-field="name" data-sortable="true"  style="width: 4%">App Name
                             </th>
 
                             <th style="width: 10%">Description
@@ -64,7 +71,7 @@
                             </th>
                             <th style="width: 30%">URL
                             </th>
-                            <th style="width: 15%">Last Update Date
+                            <th   data-field="last_update_date" data-sortable="true"  style="width: 15%">Last Update Date
                             </th>
                             <th style="width: 40%" class="text-right">Action
                             </th>
@@ -94,7 +101,7 @@
                             <td> 
                                 <%if ((bool)dr["deploy"])
                                      { %>
-                               <small>Cloud URL: <span>http://<%=dr["url"] %></span>
+                               <small>Cloud URL: <a href="http://<%=dr["url"] %>">http://<%=dr["url"] %></a>
                                     <button type="button" class="btn btn-default btn-sm copy-btn"><i class="far fa-copy"></i> Copy</button>
                                </small><br />
                                 <%} %>
@@ -225,7 +232,11 @@
                             <label for="recipient-name" class="col-form-label col-sm-4">Git Password:</label>
                             <input type="password" class="form-control  col-sm-8" name='gitpass' />
                         </div>
-               
+                       <div class="form-group row"">
+                             <label class="col-form-label col-sm-4" for="newMeportCheck">Create Mreport:</label>
+                            <input type="checkbox" class="form-control form-control-sm col-sm-1" name="createMreport" id="newMeportCheck" value=1>
+ 
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -388,7 +399,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" name='cmd' value='pull' class="btn btn-primary">Save</button>
+                        <button type="submit" name='cmd' value='pull' class="btn btn-primary">Update</button>
                     </div>
                 </div>
             </div>

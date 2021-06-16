@@ -19,6 +19,7 @@ public partial class app_list : AdminBasePage
     public DBhelper dbhelper = new DBhelper();
     public DataTable appDataTable = new DataTable();
     public string info = "";
+    public int[] cloudRepoIds = { 1 };//属于cloud的仓库，需要建立appSettings.json和ecom/config.js
     protected void Page_Load(object sender, EventArgs e)
     {
         string checkId = Request.QueryString["check"];
@@ -151,9 +152,17 @@ public partial class app_list : AdminBasePage
         };
         try
         {
-            if (dr["db_id"].ToString() != db_id)//if the db of app is change, regenerate a new appSettings.json
+    
+          
+            if (cloudRepoIds.Contains((int)dr["repo_id"]))
             {
-                CreateOrEditAppSettingsJsonFile(dr["location"].ToString(), Convert.ToInt32(db_id));
+                string appPath = Path.GetFullPath(dr["location"].ToString());
+                CreateOrEditEcomConfigFile(appPath, Convert.ToInt32(app_id));
+                if (dr["db_id"].ToString() != db_id)//if the db of app is change, regenerate a new appSettings.json
+                {
+                    CreateOrEditAppSettingsJsonFile(appPath, Convert.ToInt32(db_id));
+                }
+              
             }      
             dbhelper.ExecuteNonQuery(sc, parameters);
         }
@@ -283,14 +292,14 @@ public partial class app_list : AdminBasePage
     }
     public void CreateApp()
     {
-        string name = Request.Form["name"];
-        string repo = Request.Form["repo"];
-        string description = Request.Form["description"];
-        string username = Request.Form["gitname"];
-        string password = Request.Form["gitpass"];
-        string db= Request.Form["db"];
-     
-        string location = Path.GetFullPath(Request.Form["location"].ToString());
+        string name = Request.Form["name"].Trim();
+        string repo = Request.Form["repo"].Trim();
+        string description = Request.Form["description"].Trim();
+        string username = Request.Form["gitname"].Trim();
+        string password = Request.Form["gitpass"].Trim();
+        string db= Request.Form["db"].Trim();
+        int newAppId=0;
+        string location = Path.GetFullPath(Request.Form["location"].ToString().Trim());
         if (Convert.ToInt32(repo) > 0)//greater than 0 means choose one valid github repo
         {
             if (string.IsNullOrEmpty(location))
@@ -316,7 +325,7 @@ public partial class app_list : AdminBasePage
                 DataRow dr = repoDt.Rows[0];
                 Response.Clear();
                 Response.Write("<h1>Download Starting...</h1>");
-                Response.Write("<h1>Please do not close the page, it will spend several minutes to download files...</h1>");
+                Response.Write("<h1>Please do not close the page, it will spend several minutes downloading files...</h1>");
                 Response.Flush();
                 try
                 {
@@ -362,12 +371,19 @@ public partial class app_list : AdminBasePage
                     new SqlParameter("@creator",(int)Session["user_id"]),
                     new SqlParameter("@description", description)
                 };
-                dbhelper.ExecuteNonQuery(sc, sqlParameters);
+                newAppId=dbhelper.InsertAndGetId(sc, sqlParameters);
                 Response.Write("Record into databaset Finished.");
                 Response.Flush();
-                Common.Refresh();
+              
                 //step3:create appSettings.json for add connecting to the database
-                CreateOrEditAppSettingsJsonFile(directoryPath, Convert.ToInt32(db));
+
+                if (cloudRepoIds.Contains(Convert.ToInt32(repo)))
+                {
+                    CreateOrEditAppSettingsJsonFile(directoryPath, Convert.ToInt32(db));
+                    CreateOrEditEcomConfigFile(directoryPath, newAppId);
+
+                }
+              
             }
         }
         else{
@@ -381,9 +397,68 @@ public partial class app_list : AdminBasePage
                     new SqlParameter("@creator",(int)Session["user_id"]),
                     new SqlParameter("@description", description)
                 };
-            dbhelper.ExecuteNonQuery(sc, sqlParameters);
+           newAppId= dbhelper.InsertAndGetId(sc, sqlParameters);
         }
-       
+
+        string createMreport = Request.Form["createMreport"];
+        if (createMreport == "1")
+        {
+            string mreportName = Regex.Replace(name.ToLower(), @"\s+", "_");
+          
+            string url = String.Format(Common.GetSetting("mreport_url"), mreportName);
+            string MreportRootPath = Common.GetSetting("mreport_root_path");
+            string sourcePath = Path.Combine(MreportRootPath, "admin\\source");
+            string targetPath = Path.Combine(MreportRootPath, "m\\" + mreportName);
+            //todo: 判断不添加的条件
+            if (System.IO.Directory.Exists(targetPath) || String.IsNullOrEmpty(mreportName))
+            {
+                return;
+            }
+            System.IO.Directory.CreateDirectory(targetPath);
+            if (System.IO.Directory.Exists(sourcePath))
+            {
+                string[] files = System.IO.Directory.GetFiles(sourcePath);
+                // Copy the files and overwrite destination files if they already exist.
+                foreach (string s in files)
+                {
+                    // Use static Path methods to extract only the file name from the path.
+                    string fileName = System.IO.Path.GetFileName(s);
+                    string destFile = System.IO.Path.Combine(targetPath, fileName);
+                    System.IO.File.Copy(s, destFile, true);
+                }
+            }
+            string sc = "INSERT INTO mreport (name,description,url,location,app_id) values(@name,@description,@url,@location,@app_id)";
+            SqlParameter[] sqlParameters =
+            {
+                new SqlParameter("@app_id",newAppId),
+                new SqlParameter("@name",mreportName ),
+                new SqlParameter("@url",url),
+                new SqlParameter("@description",description),
+                new SqlParameter("@location",targetPath )
+             };
+
+            try
+            {
+                dbhelper.ExecuteNonQuery(sc, sqlParameters);
+                CreateOrEditConfigFile(targetPath, newAppId);
+                // set mreport menu in cloud
+                int db_id = (int)dbhelper.ExecuteScalar("SELECT db_id from web_app where id=" + newAppId);
+                DBhelper appHelper = new DBhelper(db_id);
+                sc = "UPDATE menu_admin_id set uri=@url where id =3219";
+                SqlParameter sqlParameter = new SqlParameter("@url", url);
+                appHelper.ExecuteNonQuery(sc, sqlParameter);
+                Common.Refresh();
+            }
+            catch (Exception e)
+            {
+                info = e.Message;
+                return;
+            }
+        }
+
+        Common.Refresh();
+         
+
         
     }
 
@@ -606,5 +681,67 @@ public partial class app_list : AdminBasePage
 
         return sb.ToString();
         //
+    }
+    public void CreateOrEditEcomConfigFile(string appPath, int app_id)
+    {
+
+        string ecomPath = Path.Combine(appPath, "ecom");
+        if (!Directory.Exists(ecomPath))
+        {
+            //throw (new Exception(path+" does not exist."));
+            return;
+        }
+        string content = "window.config =" + JsonConvert.SerializeObject(new
+        {
+            apiURL = string.Format(Common.GetSetting("cloud_ecom_api"), app_id),
+            LOGIN_AGE=3600
+        });
+
+        string configPath = Path.Combine(ecomPath, "config.js").ToString();
+
+        if (File.Exists(configPath))
+        {
+            File.Delete(configPath);
+        }
+        using (FileStream fs = File.Open(configPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
+        {
+
+            Byte[] info = new UTF8Encoding(true).GetBytes(content);
+            // Add some information to the file.
+            fs.Write(info, 0, info.Length);
+        }
+
+
+    }
+    public void CreateOrEditConfigFile(string path, int app_id)
+    {
+        if (!Directory.Exists(path))
+        {
+            //throw (new Exception(path+" does not exist."));
+            return;
+        }
+
+        string content = "var config =" + JsonConvert.SerializeObject(new
+        {
+            url = string.Format(Common.GetSetting("cloud_mreport_api"), app_id),
+            accessLevel = 1,
+            enduserLevel = 10,
+            loadingpic = "/admin/mreport/assets/images/gpos/loading2.gif"
+        });
+        string configPath = Path.Combine(path, "config.js").ToString();
+
+        if (File.Exists(configPath))
+        {
+            File.Delete(configPath);
+        }
+        using (FileStream fs = File.Open(configPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
+        {
+
+            Byte[] info = new UTF8Encoding(true).GetBytes(content);
+            // Add some information to the file.
+            fs.Write(info, 0, info.Length);
+        }
+
+
     }
 }

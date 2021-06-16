@@ -15,13 +15,11 @@ public class DBhelper
 {
     
     private SqlConnection DBhelperConnection;
-    
-   private SqlConnectionStringBuilder connbuilder = new SqlConnectionStringBuilder();
     private HttpResponse Response= HttpContext.Current.Response;
 
     public DBhelper()
     {
-      
+        SqlConnectionStringBuilder connbuilder = new SqlConnectionStringBuilder();
         connbuilder.DataSource = GetSetting("DataSource");
         connbuilder.UserID = GetSetting("DBUser");
         connbuilder.Password = GetSetting("DBpwd");
@@ -37,6 +35,7 @@ public class DBhelper
     {
         if (_connectionString == "master")
         {
+            SqlConnectionStringBuilder connbuilder = new SqlConnectionStringBuilder();
             connbuilder.DataSource = GetSetting("DataSource");
             connbuilder.UserID = GetSetting("DBUser");
             connbuilder.Password = GetSetting("DBpwd");
@@ -49,8 +48,10 @@ public class DBhelper
         }
        
     }
+   
     public DBhelper(int id)
     {
+        SqlConnectionStringBuilder connbuilder = new SqlConnectionStringBuilder();
         connbuilder.DataSource = GetSetting("DataSource");
         connbuilder.UserID = GetSetting("DBUser");
         connbuilder.Password = GetSetting("DBpwd");
@@ -63,7 +64,10 @@ public class DBhelper
 
     }
 
-    
+    public string ConnectionString()
+    {
+        return DBhelperConnection.ConnectionString;
+    }
 
     private string GetSetting(string key)
     {

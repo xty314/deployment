@@ -20,6 +20,7 @@ public partial class mreport : System.Web.UI.Page
     private string MreportRootPath = Common.GetSetting("mreport_root_path");
     protected void Page_Load(object sender, EventArgs e)
     {
+
         if (Request.Form["cmd"] == "new")
         {
             CreateNewMreport();
@@ -59,7 +60,12 @@ public partial class mreport : System.Web.UI.Page
                 CreateOrEditConfigFile(targetPath, Convert.ToInt32(app_id));
             }
             dbhelper.ExecuteNonQuery(sc, sqlParameters);
-         
+            // set mreport menu in cloud
+            int db_id = (int)dbhelper.ExecuteScalar("SELECT db_id from web_app where id=" + app_id);
+            DBhelper appHelper = new DBhelper(db_id);
+            sc = "UPDATE menu_admin_id set uri=@url where id =3219";
+            SqlParameter sqlParameter = new SqlParameter("@url", dr["url"].ToString());
+            appHelper.ExecuteNonQuery(sc, sqlParameter);
             Common.Refresh();
         }
         catch (Exception e)
@@ -115,10 +121,17 @@ public partial class mreport : System.Web.UI.Page
             new SqlParameter("@description",description),
             new SqlParameter("@location",targetPath )
          };
+        
         try
         {
             dbhelper.ExecuteNonQuery(sc, sqlParameters);
             CreateOrEditConfigFile(targetPath, Convert.ToInt32(app_id));
+            // set mreport menu in cloud
+            int db_id= (int)dbhelper.ExecuteScalar("SELECT db_id from web_app where id=" + app_id);
+            DBhelper appHelper = new DBhelper(db_id);
+            sc = "UPDATE menu_admin_id set uri=@url where id =3219";
+            SqlParameter sqlParameter = new SqlParameter("@url", url);
+            appHelper.ExecuteNonQuery(sc, sqlParameter);
             Common.Refresh();
         }
         catch (Exception e)
@@ -157,8 +170,14 @@ public partial class mreport : System.Web.UI.Page
 
     public void CreateOrEditConfigFile(string path, int app_id)
     {
-       
-        
+
+        if (!Directory.Exists(path))
+        {
+            //throw (new Exception(path+" does not exist."));
+            return;
+        }
+
+      
         string content = "var config ="+ JsonConvert.SerializeObject(new
         {
             url = string.Format(Common.GetSetting("cloud_mreport_api"),app_id),
