@@ -138,12 +138,18 @@
               <h3 class="card-title">
                <%=ScriptName(Request.QueryString["id"]) %>
               </h3>
+                <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="maximize"><i class="fas fa-expand"></i>
+                  </button>
+                </div>
             </div>
             <!-- /.card-header -->
             <div class="card-body p-0">
               <textarea class="codeMirror" name="content" class="p-3"><%=ScriptContent(Request.QueryString["id"]) %></textarea>
             </div>
-
+              <div class="card-footer">
+                   <h3><%=ScriptDescription(Request.QueryString["id"]) %></h3>
+                </div>
           </div>
                    </form>
         </div>

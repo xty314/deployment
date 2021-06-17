@@ -203,6 +203,11 @@ public partial class script : AdminBasePage
         string sc = "SELECT name FROM script where id=" + id;
         return (string)dbhelper.ExecuteScalar(sc);
     }
+    public string ScriptDescription(string id)
+    {
+        string sc = "SELECT description FROM script where id=" + id;
+        return (string)dbhelper.ExecuteScalar(sc);
+    }
     public string ScriptContent(string id)
     {
         string sc = "SELECT location FROM script where id=" + id;

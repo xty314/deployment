@@ -87,9 +87,9 @@
                                 
                                     <a class="btn btn-info btn-sm edit-btn" href="#" 
                                    data-toggle="modal" data-target="#EditUserModal"
-                                         data-id=<%=dr["id"]%>
-                                         data-name=<%=dr["name"]%>
-                                         data-email=<%=dr["email"]%>
+                                         data-id='<%=dr["id"]%>'
+                                         data-name='<%=dr["name"]%>'
+                                         data-email='<%=dr["email"]%>'
                                         >
                                     <i class="fas fa-pencil-alt">
                                     </i>
@@ -97,8 +97,8 @@
                                 </a>
                                    <a class="btn btn-danger btn-sm delete-btn" href="#" 
                                         data-toggle="modal" data-target="#DeleteUserModal"
-                                          data-id=<%=dr["id"]%>                                      
-                                         data-email=<%=dr["email"]%>
+                                          data-id='<%=dr["id"]%>'                                      
+                                         data-email='<%=dr["email"]%>'
                    
                                       >
                                     <i class="fas fa-trash">
