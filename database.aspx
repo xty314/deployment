@@ -82,7 +82,8 @@
                             </th>
                             <th>Create Date
                             </th>
-
+                             <th>Update Date
+                            </th>
                             <th class="text-right">Action
                             </th>
                         </tr>
@@ -119,7 +120,9 @@
                             <td>
                                 <%=dr["create_date"] %>         
                             </td>
-
+                             <td>
+                                <%=dr["update_date"] %>         
+                            </td>
                             <td class="project-actions text-right">
                                 <a class="btn bg-navy btn-sm deploy-btn ml-1 mb-1"
                                     href="script.aspx?db=<%=dr["id"] %>"

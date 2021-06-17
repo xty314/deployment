@@ -94,7 +94,7 @@ public partial class execute : AdminBasePage
                     SqlParameter[] sqlParameters2 =
                     {
                         new SqlParameter("@script_id",scriptDr["id"].ToString()),
-                        new SqlParameter("@upload_date", scriptDr["upload_date"].ToString())
+                        new SqlParameter("@upload_date", scriptDr["upload_date"])
 
                     };
                     int count = (int)tenantDbHelper.ExecuteScalar(sc, sqlParameters2);
@@ -152,7 +152,7 @@ public partial class execute : AdminBasePage
                         new SqlParameter("@id",scriptDr["id"].ToString()),
                         new SqlParameter("@name",scriptDr["name"].ToString()),
                         new SqlParameter("@uploader",scriptDr["uploader"].ToString()),
-                         new SqlParameter("@upload_date",scriptDr["upload_date"].ToString()),
+                         new SqlParameter("@upload_date",scriptDr["upload_date"]),
                         new SqlParameter("@description",scriptDr["description"].ToString()),
                         new SqlParameter("@location",scriptDr["location"].ToString()),
                         new SqlParameter("@executor",executor),
@@ -167,6 +167,13 @@ public partial class execute : AdminBasePage
                     Common.UpdateInstallDbBak(Convert.ToInt32(dr["id"].ToString()));
                     Response.Write(String.Format("<h1>Update install db bak file.</h1>"));
                     Response.Flush();
+                }
+                else
+                {
+                    string sql = "UPDATE db_list SET update_date=GETDATE() where id=" + dr["id"].ToString();
+                    dbhelper.ExecuteNonQuery(sql);
+                    //record database update date
+
                 }
               
 
