@@ -91,7 +91,7 @@
                     <tbody>
                         <%foreach (DataRow dr in dbDataTable.Rows)
                             {%>
-                        <tr>
+                        <tr class="<%=ActiveRow(dr["id"].ToString())%>">
                             <%if (!string.IsNullOrEmpty(Request.QueryString["origin"]) && Request.QueryString["origin"] != "0")
                                 {%>
                             <td>
@@ -156,7 +156,7 @@
                                 </a>
                                 <%if ((bool)dr["removable"])
                                     { %>
-                                <a class="btn btn-danger btn-sm delete-btn" href="#"
+                                <a class="btn btn-danger btn-sm delete-btn ml-1 mb-1" href="#"
                                     data-toggle="modal" data-target="#DeleteModal"
                                     data-name="<%=dr["name"] %>"
                                     data-id='<%=dr["id"]%>'
@@ -299,6 +299,7 @@
                     </div>
                     <div class="modal-body">
                         <input type="hidden" class="form-control  col-sm-8" name='id' />
+                        <input type="hidden" class="form-control  col-sm-8" name='url' value="database.aspx" />
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input " id="cbx1" name="install_db" value="1">
                             <label class="form-check-label" for="cbx1">Update install database</label>
@@ -319,6 +320,11 @@
     <!-- /.content -->
 </asp:Content>
 <asp:Content ContentPlaceHolderID="AdditionalCSS" runat="server">
+    <style>
+        .active-tr{
+                background-color:aqua!important;
+        }
+    </style>
 </asp:Content>
 <asp:Content ContentPlaceHolderID="AdditionalJS" runat="server">
 

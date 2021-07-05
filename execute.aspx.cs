@@ -173,12 +173,18 @@ public partial class execute : AdminBasePage
                     string sql = "UPDATE db_list SET update_date=GETDATE() where id=" + dr["id"].ToString();
                     dbhelper.ExecuteNonQuery(sql);
                     //record database update date
-
                 }
+            
+               
               
 
             }
-
+            string returnUrl = "database.aspx";
+            if (!string.IsNullOrEmpty(Request.Form["url"]))
+            {
+                returnUrl = Request.Form["url"];
+            }
+            Response.Write(String.Format("<h1><a href='{0}'>>>>>>BACK<<<<<</a></h1>", returnUrl));
         }
         catch (Exception e)
         {

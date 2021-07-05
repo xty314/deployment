@@ -95,7 +95,7 @@
                             </td>
                 
                             <td>
-                                <%=dr["db_name"] %><br />
+                               <a href="database.aspx?id=<%=dr["db_id"] %>"><%=dr["db_name"] %></a> <br />
                                  <small><%=Common.GetServer(dr["conn_str"].ToString()) %></small>
                             </td>
                             <td> 

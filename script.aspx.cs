@@ -128,7 +128,7 @@ public partial class script : AdminBasePage
             DBName = "Database: "+(string)dbhelper.ExecuteScalar(sc);
 
             DBhelper tenantHelper = new DBhelper(Convert.ToInt32(db));
-            sc = "SELECT * FROM script order by id";
+            sc = "SELECT * FROM script order by execute_date";
             scriptDataTable = tenantHelper.ExecuteDataTable(sc);
 
 
@@ -141,7 +141,7 @@ public partial class script : AdminBasePage
             DBName = "Install Database: " + dr["name"];
 
             DBhelper installHelper = new DBhelper(dr["conn_str"].ToString());
-            sc = "SELECT * FROM script order by id";
+            sc = "SELECT * FROM script order by  execute_date";
             scriptDataTable = installHelper.ExecuteDataTable(sc);
 
 

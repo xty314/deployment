@@ -281,6 +281,7 @@
                     </div>
                     <div class="modal-body">
                         <input type="hidden" class="form-control  col-sm-8" name='id' />
+                         <input type="hidden" class="form-control  col-sm-8" name='url' value="install_db.aspx" />
                
                 
                         <div class="form-group row">

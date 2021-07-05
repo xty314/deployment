@@ -7,7 +7,7 @@
 
 
     if (origin == 0) {
-        $("#deletePrompt").html(" Are you sure to delete the record of [" + name + "]? <br> The database is not created by this app, so you can not delete the database.");
+        $("#deletePrompt").html(" Are you sure to delete the record of [" + name + "]? <br> The database is not created by this setup app, so you can not delete the database.");
         $("#deleteDbCheck").prop("checked", false);
         $("#backupCheck").prop("checked", false);
         $("#deleteDbCheck").prop("disabled", true);

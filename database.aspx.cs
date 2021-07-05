@@ -354,4 +354,14 @@ public partial class database : AdminBasePage
         return sb.ToString();
         //
     }
+    public string ActiveRow(string id)
+    {
+        string result = "";
+
+        if (id ==Request.QueryString["id"])
+        {
+            result = "active-tr";
+        }
+        return result;
+    }
 }
