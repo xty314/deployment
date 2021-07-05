@@ -108,6 +108,7 @@
                                   <a class="btn btn-danger btn-sm delete-btn" href="#" 
                                         data-toggle="modal" data-target="#DeleteModal"
                               data-id="<%=dr["id"] %>"
+                                       data-name="<%=dr["name"] %>"
                                       >
                                     <i class="fas fa-trash">
                                     </i>

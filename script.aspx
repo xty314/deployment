@@ -222,7 +222,7 @@
                     <!-- <label for="customFile">Custom File</label> -->
                         <label for="recipient-name" class="col-form-label col-sm-4">File:</label>
                     <div class="custom-file col-sm-8">
-                      <input type="file" class="custom-file-input" id="scriptFile" name="scriptFile">
+                      <input type="file" class="custom-file-input" id="scriptFile" name="scriptFile" accept=".sql" >
                       <label class="custom-file-label" for="customFile">Choose file</label>
                     </div>
                   </div>
@@ -243,7 +243,7 @@
     <form  method="post" id='EditForm'>
         <div class="modal fade" id="EditModal" tabindex="-1" role="dialog" 
             aria-hidden="true">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Eidt Script Info</h5>
@@ -310,7 +310,8 @@
     <style>
         .CodeMirror {
   border: 1px solid #eee;
-  height: 500px;
+  height: 100%;
+
 }
     </style>
 </asp:Content>

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.UI;
+using System.Text.RegularExpressions;
 using System.Web.UI.WebControls;
 
 public partial class script : AdminBasePage
@@ -72,13 +73,14 @@ public partial class script : AdminBasePage
     {
        string content = Request["content"];
         string name = Request.Form["name"].ToString().Trim();
+        string fileName = Regex.Replace(name, @"\s+", "_");
         string description = Request.Form["description"];
-        string scriptPath = Server.MapPath("~/script/" + name + ".sql");
+        string scriptPath = Server.MapPath("~/script/" + fileName + ".sql");
 
 
         if (System.IO.File.Exists(scriptPath))
         {
-            scriptPath = Server.MapPath("~/script/" + Path.GetRandomFileName() + ".sql");
+            scriptPath = Server.MapPath("~/script/" + fileName+"."+ Path.GetRandomFileName() + ".sql");
         }
         try
         {
@@ -126,7 +128,7 @@ public partial class script : AdminBasePage
             DBName = "Database: "+(string)dbhelper.ExecuteScalar(sc);
 
             DBhelper tenantHelper = new DBhelper(Convert.ToInt32(db));
-            sc = "SELECT * FROM script";
+            sc = "SELECT * FROM script order by id";
             scriptDataTable = tenantHelper.ExecuteDataTable(sc);
 
 
@@ -139,14 +141,14 @@ public partial class script : AdminBasePage
             DBName = "Install Database: " + dr["name"];
 
             DBhelper installHelper = new DBhelper(dr["conn_str"].ToString());
-            sc = "SELECT * FROM script";
+            sc = "SELECT * FROM script order by id";
             scriptDataTable = installHelper.ExecuteDataTable(sc);
 
 
         }
         else
         {
-            string sc = "SELECT * FROM script where del=0";
+            string sc = "SELECT * FROM script where del=0 order by id";
             scriptDataTable = dbhelper.ExecuteDataTable(sc);
         }
        
