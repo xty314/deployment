@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="app_list.aspx.cs" Inherits="app_list" MasterPageFile="./master/_layout.master" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="dev_app.aspx.cs" Inherits="app_list" MasterPageFile="./master/_layout.master" %>
 
 
 <%--import MasterPageFile--%>
@@ -14,8 +14,8 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6 row">
-                    <h1 class="mr-5">Web App</h1>
-                    <%=PrintRepoListHeader() %>
+                    <h1 class="mr-5">Development App</h1>
+                  
                 </div>
                 <div class="col-sm-6">
                     <div class="float-right">
@@ -71,10 +71,9 @@
                             </th>
                             <th style="width: 30%">URL
                             </th>
-                                 <th style="width: 10%">IIS State
+                             <th style="width: 30%">IIS State
                             </th>
-                            <th   data-field="last_update_date" data-sortable="true"  style="width: 15%">Last Update Date
-                            </th>
+                         
                             <th style="width: 40%" class="text-right">Action
                             </th>
                         </tr>
@@ -121,7 +120,7 @@
                                <td>
                                 <%string iisState=GetiisState(dr["id"].ToString()); %>  
                                  <%if (!string.IsNullOrEmpty(iisState)){ %>
-                                   <%=iisState %><br />
+                                   <%=iisState %>
 
                                     <a class="btn bg-lightblue btn-sm restart-btn ml-1 mb-1" href="#"
                                     data-toggle="modal" data-target="#RestartModal" data-id='<%=dr["id"]%>'>
@@ -135,9 +134,7 @@
                                  <%}%>
                                    
                             </td>
-                            <td>
-                                <%=dr["last_update_date"] %>            
-                            </td>
+                       
 
                             <td class="project-actions text-right">
                                 <div class="btn-group ml-1 mb-1">
@@ -151,14 +148,7 @@
                                     </div>
                                 </div>
 
-                              <%if((int)dr["repo_id"]>0){ %>
-                                <a class="btn btn-warning btn-sm pull-btn ml-1 mb-1" href="#"
-                                   data-toggle="modal" data-target="#PullModal"
-                                    data-id="<%=dr["id"] %>""
-                                   >
-                                    <i class="fas fa-plus-circle"></i>
-                                    Update
-                                </a>
+              
                                 <a class="btn btn-danger btn-sm edit-btn ml-1 mb-1" href="?check=<%=dr["id"] %>">
                                     <i class="fas fa-history"></i>
                                     Modify Check
@@ -180,7 +170,7 @@
                                     Unbind IIS
                                 </a>
                             
-                                <%} } %>
+                                <%} %>
                                 <a class="btn btn-info btn-sm edit-btn ml-1 mb-1" href="#"
                                     data-toggle="modal" data-target="#EditModal"
                                     data-id='<%=dr["id"]%>'
@@ -231,31 +221,21 @@
                     </div>
                     <div class="modal-body">
                          <div class="form-group row">
-                            <label for="recipient-name" class="col-form-label col-sm-4">Directory:</label>
+                            <label for="recipient-name" class="col-form-label col-sm-4">Location:</label>
                             <input type="text" class="form-control  col-sm-8" name='location' value="<%=Common.GetSetting("app_install_location") %>">
                         </div>
                         <div class="form-group row">
                             <label for="recipient-name" class="col-form-label col-sm-4">Name:</label>
                             <input type="text" class="form-control  col-sm-8" name='name'>
                         </div>
-                        <%=PrintRepoList()%>
                         <%= PrintDbList()%>
                         <div class="form-group row">
                             <label class="col-form-label col-sm-4">Description</label>
                             <textarea class="form-control col-sm-8" rows="3" name="description" placeholder="Description ..." style="margin-top: 0px; margin-bottom: 0px; height: 105px;"></textarea>
                         </div>
-                        <div class="form-group row private_info">
-                            <label for="recipient-name" class="col-form-label col-sm-4">Git User Name:</label>
-                            <input type="text" class="form-control  col-sm-8" name='gitname'>
-                        </div>
-                        <div class="form-group row private_info">
-                            <label for="recipient-name" class="col-form-label col-sm-4">Git Password:</label>
-                            <input type="password" class="form-control  col-sm-8" name='gitpass' />
-                        </div>
                        <div class="form-group row"">
                              <label class="col-form-label col-sm-4" for="newMeportCheck">Create Mreport:</label>
                             <input type="checkbox" class="form-control form-control-sm col-sm-1" name="createMreport" id="newMeportCheck" value=1>
- 
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -321,13 +301,12 @@
                           <h5>url example: test.gpos.nz,   aaa.com </h5>
                         <div class="form-group row">
                             <label for="recipient-name" class="col-form-label col-sm-4">URL:</label>
-                         <div class="input-group col-sm-8">
+                                    <div class="input-group col-sm-8">
                   <div class="input-group-prepend">
                     <span class="input-group-text">http://</span>
                   </div>
                  <input type="text" class="form-control  " name='url'/>
                 </div>
-                            
                         </div>
 
 
@@ -340,30 +319,7 @@
             </div>
     </div>
     </form>
-       <form method="post" id='RestartForm'>
-        <div class="modal fade" id="RestartModal" tabindex="-1" role="dialog"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content bg-lightblue">
-                    <div class="modal-header">
-                        <h5 class="modal-title">IIS</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body" >
-                        <input type="hidden" class="form-control  col-sm-8" name='id' />
-                        <h5>Are you sure to operate IIS?</h5>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" name='cmd' value="restart" class="btn btn-info" >Comfirm</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
+  
  <form method="post" id='UnbindForm'>
         <div class="modal fade" id="UnbindModal" tabindex="-1" role="dialog"
             aria-hidden="true">
@@ -383,6 +339,30 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button type="submit" name='cmd' value="idle" class="btn btn-warning" >Comfirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+     <form method="post" id='RestartForm'>
+        <div class="modal fade" id="RestartModal" tabindex="-1" role="dialog"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content bg-lightblue">
+                    <div class="modal-header">
+                        <h5 class="modal-title">IIS</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" >
+                        <input type="hidden" class="form-control  col-sm-8" name='id' />
+                        <h5>Are you sure to operate IIS?</h5>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" name='cmd' value="restart" class="btn btn-info" >Comfirm</button>
                     </div>
                 </div>
             </div>
@@ -408,10 +388,6 @@
                             <input type="password" class="form-control  col-sm-8" name='password'>
                         </div>
                 
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input form-check-input-lg" name="deleteFile" id="deleteCheck" value="1" checked>
-                            <label class="form-check-label" for="deleteCheck">Delete the directory <span id="deleteFileLocation"></span></label>
-                        </div>
 
                     </div>
 
@@ -457,5 +433,5 @@
     <!-- /.content -->
 </asp:Content>
 <asp:Content ContentPlaceHolderID="AdditionalJS" runat="server">
-    <script src="src/js/app_list.js"></script>
+    <script src="src/js/dev_app.js"></script>
 </asp:Content>

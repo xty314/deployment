@@ -38,18 +38,22 @@ $(document).on("click", ".delete-btn", function (e) {
         $("#deleteCheck").attr("disabled", true);
     }
    
-    $("#DeleteForm input[name=id]").val(id)
+    $("#DeleteForm input[name=id]").val(id);
     $("#deletePrompt").html("Are you sure to delete [" + $(this).data("name")+"]")
     $("#deleteFileLocation").html(" [" + $(this).data("location") + "]")
 })
 
 $(document).on("click", ".unbind-btn", function (e) {
     var id = $(this).data("id");
-    $("#UnbindForm input[name=id]").val(id)
+    $("#UnbindForm input[name=id]").val(id);
+})
+$(document).on("click", ".restart-btn", function (e) {
+    var id = $(this).data("id");
+    $("#RestartForm input[name=id]").val(id);
 })
 $(document).on("click", ".deploy-btn", function (e) {
     var id = $(this).data("id");
-    $("#DeployForm input[name=id]").val(id)
+    $("#DeployForm input[name=id]").val(id);
 })
 $(document).on("click", ".copy-btn", function (e) {
     var apiContent = $(this).prev().html();
@@ -75,8 +79,4 @@ $(document).on("click", ".copy-btn", function (e) {
 $(document).on("click", ".pull-btn", function (e) {
     var id = $(this).data("id");
     $("#PullForm input[name=id]").val(id)
-})
-$(document).on("click", ".restart-btn", function (e) {
-    var id = $(this).data("id");
-    $("#RestartForm input[name=id]").val(id);
 })

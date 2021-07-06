@@ -34,11 +34,59 @@ public partial class database : AdminBasePage
         {
             BackupDatabase();
         }
-
+        if (Request.Form["copyDb"] != null && Request.Form["copyDb"] != "")
+        {
+            CopyDatabase();
+        }
         LoadDatabaseList();
     }
 
- 
+    private void CopyDatabase()
+    {
+        string databaseId = Request.Form["copyDb"];
+        DateTime currentTime = DateTime.Now;
+        string backupPath = Common.GetSetting("db_backup_location");
+        string connStr = (string)dbhelper.ExecuteScalar("SELECT conn_str FROM db_list WHERE id=" + databaseId);
+        try
+        {
+            string server = Common.GetServer(connStr);
+            string database = Common.GetDatabase(connStr);
+            string masterDbConnection = "Server=" + server + ";Database=master;User Id=eznz;password=9seqxtf7";
+            DBhelper masterHelper = new DBhelper(masterDbConnection);
+            string bakName = database + "_" + currentTime.ToString("yyyyMMddHHmmss") + ".bak";
+            backupPath = Path.Combine(backupPath, bakName);
+            //step1 back origin db
+            string sc = String.Format("Backup Database [{0}] To disk = '{1}' WITH INIT", database, backupPath);
+            masterHelper.ExecuteNonQuery(sc);
+            //step2 create a new db
+            string copyDbName = database + currentTime.ToString("yyyyMMddHHmmss");
+            dbhelper.CreadDatabase(masterDbConnection, copyDbName);
+            //还原bak的文件地址路径
+            //!!!!bak文件需要在数据库的服务器上，地址也为数据库上bak的路径不是aspx程序的服务器
+            //step3 restore db with the new bak
+            sc = String.Format("RESTORE DATABASE {0} FROM DISK = '{1}' WITH REPLACE", copyDbName, backupPath);
+            masterHelper.ExecuteNonQuery(sc);
+
+            int creator = (int)Session["user_id"];
+            sc = @"INSERT INTO db_list (name,conn_str,creator,install_db_id,dev) VALUES
+                    (@name,@conn_str,@creator,0,1)";
+            string newDbConnection = "Server=" + server + ";Database=" + copyDbName + ";User Id=eznz;password=9seqxtf7";
+            SqlParameter[] parameters =
+            {
+               new SqlParameter("@name", copyDbName),
+               new SqlParameter("@conn_str",newDbConnection),
+               new SqlParameter("@creator", creator),         
+            };
+            dbhelper.ExecuteNonQuery(sc, parameters);
+            info =string.Format("Copy database successfully, new dev database {0} in the server {1}", copyDbName,server);
+        }
+        catch (Exception e)
+        {
+
+            info = e.Message;
+        }
+        
+    }
 
     private void DeleteDatabase()
     {
@@ -168,7 +216,6 @@ public partial class database : AdminBasePage
     {
         string database = Request.Form["backupDb"];
         info= Backup(database);
-
     }
     private void CreateNewDatabase()
     {
@@ -277,15 +324,29 @@ public partial class database : AdminBasePage
 
       Common.Refresh();
     }
-    private string Backup(string database)
+    private string Backup(string databaseId)
     {
         DateTime currentTime = DateTime.Now;
         string backupPath = Common.GetSetting("db_backup_location");
-        string bakName = database + "_" + currentTime.ToString("yyyyMMddHHmmss") + ".bak";
-        backupPath = Path.Combine(backupPath, bakName);
-        string sc = String.Format("Backup Database {0} To disk = '{1}' WITH INIT", database, backupPath);
-        dbhelper.ExecuteNonQuery(sc);
-        return string.Format("Backup successfully, please go to {0} to check file {1}", Common.GetSetting("db_server"), backupPath);
+        string connStr = (string)dbhelper.ExecuteScalar("SELECT conn_str FROM db_list WHERE id=" + databaseId);
+        try
+        {
+            string server = Common.GetServer(connStr);
+            string database = Common.GetDatabase(connStr);
+            string masterDbConnection = "Server=" + server + ";Database=master;User Id=eznz;password=9seqxtf7";
+            DBhelper masterHelper = new DBhelper(masterDbConnection);
+            string bakName = database + "_" + currentTime.ToString("yyyyMMddHHmmss") + ".bak";
+            backupPath = Path.Combine(backupPath, bakName);
+            string sc = String.Format("Backup Database [{0}] To disk = '{1}' WITH INIT", database, backupPath);
+            masterHelper.ExecuteNonQuery(sc);
+            return string.Format("Backup successfully, please go to {0} to check file {1}", Common.GetSetting("db_server"), backupPath);
+        }catch(Exception e)
+        {
+        
+            return e.Message;
+        }
+       
+      
     }
     private void LoadDatabaseList()
     {
@@ -293,11 +354,11 @@ public partial class database : AdminBasePage
         string sc = "";
         if (string.IsNullOrEmpty(origin))
         {
-            sc="select db.*,id.name as 'install_db_name' from  db_list db left join install_db id on db.install_db_id=id.id";
+            sc= "select db.*,id.name as 'install_db_name' from  db_list db left join install_db id on db.install_db_id=id.id where db.dev=0";
         }
         else 
         {
-            sc = "select db.*,id.name as 'install_db_name' from  db_list db left join install_db id on db.install_db_id=id.id where db.install_db_id="+origin;
+            sc = "select db.*,id.name as 'install_db_name' from  db_list db left join install_db id on db.install_db_id=id.id where db.dev=0 and db.install_db_id="+origin;
         }
       
         dbDataTable = dbhelper.ExecuteDataTable(sc);

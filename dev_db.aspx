@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="database.aspx.cs" Inherits="database" MasterPageFile="./master/_layout.master" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="dev_db.aspx.cs" Inherits="database" MasterPageFile="./master/_layout.master" %>
 
 
 <%--import MasterPageFile--%>
@@ -13,25 +13,10 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6 row">
-                    <h1 class="mr-5">Database</h1>
-                    <%=PrintInstallDbListHeader() %>
+                    <h1 class="mr-5">Development Database</h1>
+                   
                 </div>
-                <div class="col-sm-6">
-                    <div class="float-right">
-                        <button class="btn bg-blue" data-toggle="modal" data-target="#NewModal">
-                            <i
-                                class="fa fa-pen"></i>Add New Database</button>
-                        <%if (!string.IsNullOrEmpty(Request.QueryString["origin"]) && Request.QueryString["origin"] != "0")
-                            {%>
-                        <button class="btn bg-indigo" data-toggle="modal" data-target="#ScriptModal">
-                            <i
-                                class="fa fa-book"></i>
-                            Bulk Run Script
-                        </button>
-                        <%} %>
-                        <%-- <button type="button" class="btn btn-success"><i class="fa fa-download"></i>Export </button>--%>
-                    </div>
-                </div>
+   
             </div>
         </div>
         <!-- /.container-fluid -->
@@ -78,12 +63,10 @@
                             </th>
                             <th>Server
                             </th>
-                            <th>Origin
-                            </th>
+                      
                             <th>Create Date
                             </th>
-                             <th>Update Date
-                            </th>
+                           
                             <th class="text-right">Action
                             </th>
                         </tr>
@@ -91,7 +74,7 @@
                     <tbody>
                         <%foreach (DataRow dr in dbDataTable.Rows)
                             {%>
-                        <tr class="<%=ActiveRow(dr["id"].ToString())%>">
+                        <tr >
                             <%if (!string.IsNullOrEmpty(Request.QueryString["origin"]) && Request.QueryString["origin"] != "0")
                                 {%>
                             <td>
@@ -114,15 +97,11 @@
                             <td>
                                 <%=Common.GetServer(dr["conn_str"].ToString()) %>
                             </td>
-                            <td>
-                                <%=dr["install_db_name"] %>
-                            </td>
+                        
                             <td>
                                 <%=dr["create_date"] %>         
                             </td>
-                             <td>
-                                <%=dr["update_date"] %>         
-                            </td>
+                          
                             <td class="project-actions text-right">
                                 <a class="btn bg-navy btn-sm deploy-btn ml-1 mb-1"
                                     href="script.aspx?db=<%=dr["id"] %>"
@@ -130,19 +109,7 @@
                                     <i class="fas fa-history"></i>
                                     Script History
                                 </a>
-                                <button class="btn btn-warning btn-sm backup-btn ml-1 mb-1"
-                                   
-                                   name="backupDb" value="<%=dr["id"] %>"
-                                   <%-- name="backupDb" value="<%=Common.GetDatabase(dr["conn_str"].ToString()) %>"--%>
-                                    >
-                                    <i class="fas fa-download"></i> Back up
-                                </button>
-                                   <button class="btn bg-orange btn-sm backup-btn ml-1 mb-1"
-                                   
-                                   name="copyDb" value="<%=dr["id"] %>"
-                                    >
-                                    <i class="fas fa-copy"></i> Copy
-                                </button>
+
                                 <a class="btn bg-indigo btn-sm script-btn ml-1 mb-1" href="#"
                                     data-toggle="modal" data-target="#ScriptModal" data-id='<%=dr["id"]%>'
                                     data-install=false
@@ -183,37 +150,7 @@
         <!-- /.card -->
         </form>
     </section>
-    <form method="post" id='NewForm'>
-        <div class="modal fade" id="NewModal" tabindex="-1" role="dialog"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">New Database</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
 
-                        <div class="form-group row">
-                            <label for="recipient-name" class="col-form-label col-sm-4">DB Name:</label>
-                            <input type="text" class="form-control  col-sm-8" name='dbname'>
-                        </div>
-                        <div class="form-group row">
-                            <label for="recipient-name" class="col-form-label col-sm-4">DB Server:</label>
-                            <input type="text" class="form-control  col-sm-8" name='server' value="<%= Common.GetSetting("db_server")%>" />
-                        </div>
-                        <%=PrintInstallDbList() %>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" name='cmd' value='new' class="btn btn-primary">Save</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
     <form method="post" id='EditForm'>
         <div class="modal fade" id="EditModal" tabindex="-1" role="dialog"
             aria-hidden="true">
@@ -268,20 +205,14 @@
                     </div>
                     <div class="modal-body" id="DeleteModalBody">
                         <input type="hidden" class="form-control  col-sm-8" name='id' />
-
-                        <h5 id="deletePrompt"></h5>
+                          <input type="hidden" class="form-control  col-sm-8" name='deleteDb' value="1" />
+                        <h5 > Are you sure to delete this dev database?</h5>
                         <div class="form-group row">
                             <label for="recipient-name" class="col-form-label col-sm-4">Password:</label>
                             <input type="password" class="form-control  col-sm-8" name='password'>
                         </div>
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input form-check-input-lg" name="deleteDb" id="deleteDbCheck" value="1">
-                            <label class="form-check-label" for="deleteDbCheck">delete database.</label>
-                        </div>
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input form-check-input-lg" name="backup" id="backupCheck" value="1">
-                            <label class="form-check-label" for="backupCheck">back up database.</label>
-                        </div>
+             
+
 
                     </div>
 
@@ -307,10 +238,7 @@
                     <div class="modal-body">
                         <input type="hidden" class="form-control  col-sm-8" name='id' />
                         <input type="hidden" class="form-control  col-sm-8" name='url' value="database.aspx" />
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input " id="cbx1" name="install_db" value="1">
-                            <label class="form-check-label" for="cbx1">Update install database</label>
-                        </div>
+         
                         <div class="form-group row">
                             <label for="editDatabase" class="col-form-label col-sm-4" id="scriptLabel">Script:</label>
 

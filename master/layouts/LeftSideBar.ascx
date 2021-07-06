@@ -103,7 +103,31 @@
                        
                     </ul>
                 </li>
-         
+          <li class="nav-item  menu-is-opening menu-open">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon far fa-file-code"></i>
+                        <p>
+                          Development
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                         <li class="nav-item">
+                            <a href="dev_app.aspx" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Dev App</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="dev_db.aspx" class="nav-link ">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Dev Database</p>
+                            </a>
+                        </li>
+                    
+                       
+                    </ul>
+                </li>
                 <li class="nav-item">
                     <a href="setting.aspx" class="nav-link">
                         <i class="nav-icon fas fa-th"></i>

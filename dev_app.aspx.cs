@@ -56,6 +56,7 @@ public partial class app_list : AdminBasePage
         }
         LoadAppList();
     }
+
     private void RestartApp()
     {
         string app_id = Request.Form["id"];
@@ -67,7 +68,7 @@ public partial class app_list : AdminBasePage
         {
             ServerManager iismanager = new ServerManager();
             ObjectState currentStart = iismanager.Sites[siteName].State;
-            if (currentStart == ObjectState.Started)
+            if(currentStart == ObjectState.Started)
             {
                 iismanager.Sites[siteName].Stop();
                 iismanager.ApplicationPools[siteName].Stop();
@@ -80,37 +81,37 @@ public partial class app_list : AdminBasePage
                 info = "App has already started.";
             }
         }
-        catch (Exception e)
+        catch(Exception e)
         {
             info = e.Message;
             return;
         }
-
-
+       
+        
     }
     public string GetiisState(string id)
     {
-
+        
         string sc = "SELECT top 1 * from web_app where id=" + id;
         DataTable dt = dbhelper.ExecuteDataTable(sc);
         DataRow dr = dt.Rows[0];
         string siteName = dr["url"].ToString();
         string result = "";
         ServerManager iismanager = new ServerManager();
-        if (!string.IsNullOrEmpty(siteName) && iismanager.Sites[siteName] != null)
+        if (!string.IsNullOrEmpty(siteName)&& iismanager.Sites[siteName] != null)
         {
             try
             {
                 result = iismanager.Sites[siteName].State.ToString();
             }
-            catch (System.Runtime.InteropServices.COMException e)
+            catch(System.Runtime.InteropServices.COMException e)
             {
                 Common.Refresh();
                 return result;
             }
-
+         
         }
-
+     
         return result;
     }
     private void CheckApp()
@@ -198,9 +199,7 @@ public partial class app_list : AdminBasePage
         string sc = "SELECT top 1 * from web_app where id=" + app_id;
         DataTable dt = dbhelper.ExecuteDataTable(sc);
         DataRow dr = dt.Rows[0];
-       
        sc = "UPDATE web_app set name=@name, description=@description,db_id=@db_id,removable=@removable where id=@app_id";
-
         SqlParameter[] parameters =
         {
             new SqlParameter("@name",name),
@@ -211,8 +210,6 @@ public partial class app_list : AdminBasePage
         };
         try
         {
-    
-          
             if (cloudRepoIds.Contains((int)dr["repo_id"]))
             {
                 string appPath = Path.GetFullPath(dr["location"].ToString());
@@ -224,6 +221,7 @@ public partial class app_list : AdminBasePage
               
             }      
             dbhelper.ExecuteNonQuery(sc, parameters);
+        
         }
         catch(Exception e)
         {
@@ -241,8 +239,6 @@ public partial class app_list : AdminBasePage
     {
         string password = Request.Form["password"].ToString();
         string app_id= Request.Form["id"].ToString();
-        bool deleteFile = string.IsNullOrEmpty(Request.Form["deleteFile"])?false:true;
-      
         if (password != Common.password)
         {
             info = "invalid password";
@@ -251,49 +247,22 @@ public partial class app_list : AdminBasePage
         string sc = "SELECT top 1 * from web_app where id=" + app_id;
         DataTable dt = dbhelper.ExecuteDataTable(sc);
         DataRow dr = dt.Rows[0];
-        if ((bool)dr["dev"])
+        if (!(bool)dr["dev"])
         {
-            info = "This app is for development, please delete this app manually.";
+            info = "This app is not for development.";
             return;
         }
-        if ((bool)dr["deploy"])
+        string sql = "SELECT count(*) from mreport where app_id=" + app_id;
+        int count = (int)dbhelper.ExecuteScalar(sql);
+        if (count > 0)
         {
-            info = "This app has already deployed in IIS, please unbind the app first and try again.";
+            info = "This app is occupied by mreport, please delete mreport first and try again.";
             return;
         }
-        if ((bool)dr["customize"])
-        {
-            info = "This app is customized. Please delete this app manually";
-            return;
-        }
-        if (!(bool)dr["removable"])
-        {
-            info = "This app can not be removed.";
-            return;
-        }
-        if ((int)dr["repo_id"]<=0||string.IsNullOrEmpty(dr["location"].ToString()))
-        {
-            deleteFile = false;
-            string sql = "SELECT count(*) from mreport where app_id=" + app_id;
-            int count = (int)dbhelper.ExecuteScalar(sql);
-            if (count > 0)
-            {
-                info = "This app is occupied by mreport, please delete mreport first and try again.";
-                return;
-            }
-        }
+      
         try
         {
-            if (deleteFile)
-            {
-                DirectoryInfo di = new DirectoryInfo(Path.GetFullPath(dr["location"].ToString()));
-                if (di.Exists)
-                {
-                    DeleteDirectory(Path.GetFullPath(dr["location"].ToString()));
-                }
-            }
-         
-            sc = "DELETE FROM web_app where id=" + app_id;
+            sc = "DELETE FROM web_app where dev=1 and id=" + app_id;
             dbhelper.ExecuteNonQuery(sc);
         }catch(Exception e)
         {
@@ -357,113 +326,40 @@ public partial class app_list : AdminBasePage
     public void CreateApp()
     {
         string name = Request.Form["name"].Trim();
-        string repo = Request.Form["repo"].Trim();
+        string repo ="1";
         string description = Request.Form["description"].Trim();
-        string username = Request.Form["gitname"].Trim();
-        string password = Request.Form["gitpass"].Trim();
         string db= Request.Form["db"].Trim();
-        int newAppId=0;
         string location = Path.GetFullPath(Request.Form["location"].ToString().Trim());
-        if (Convert.ToInt32(repo) > 0)//greater than 0 means choose one valid github repo
+        string appSettingsPath = Path.Combine(location, "appSettings.json").ToString();
+        if (!Directory.Exists(location))
         {
-            if (string.IsNullOrEmpty(location))
-            {
-                location = Path.GetFullPath(Common.GetSetting("app_install_location"));
-            }
-            string sc = "SELECT * FROM git_repository WHERE id=" + repo;
-            DataTable repoDt = dbhelper.ExecuteDataTable(sc);
-            string directoryPath = Path.Combine(location, name);//location + "\\\\" + name;
-
-            if (!Directory.Exists(directoryPath))
-            {
-                Directory.CreateDirectory(directoryPath);
-            }
-            else
-            {
-                info = "App directory exists, please change a name.";
-                return;
-            }
-            if (repoDt.Rows.Count == 1)
-            {
-
-                DataRow dr = repoDt.Rows[0];
-                Response.Clear();
-                Response.Write("<h1>Download Starting...</h1>");
-                Response.Write("<h1>Please do not close the page, it will spend several minutes downloading files...</h1>");
-                Response.Flush();
-                try
-                {
-                    if (!(bool)dr["private"])
-                    {
-                        //public  git repo no password
-                        Repository.Clone(dr["url"].ToString(), directoryPath);//x64
-
-                    }
-                    else
-                    {
-                        CloneOptions options = new CloneOptions
-                        {
-                            CredentialsProvider = (_url, _user, _cred) => new UsernamePasswordCredentials
-                            {
-                                Username = username,
-                                Password = password
-                            },
-                        };
-
-                        //private git repo need user name and password
-                        Repository.Clone(dr["url"].ToString(), directoryPath, options);//x64
-                    }
-                }
-                catch (Exception e)
-                {
-                    DirectoryInfo di = new DirectoryInfo(directoryPath);
-                    di.Delete();//如果出错就删除创建的文件夹
-                    info = e.Message;
-                    return;
-                }
-                Response.Write("Download Fininshed.");
-                Response.Write("Record into databaset Starting.");
-                Response.Flush();
-                //step2: insert into database
-                sc = "INSERT into web_app (name,location,db_id,repo_id,creator,description) VALUES(@name,@location,@db_id,@repo_id,@creator,@description) ";
-                SqlParameter[] sqlParameters =
-                {
-                    new SqlParameter("@name",name),
-                    new SqlParameter("@location",directoryPath),
-                    new SqlParameter("@db_id",db),
-                    new SqlParameter("@repo_id",repo),
-                    new SqlParameter("@creator",(int)Session["user_id"]),
-                    new SqlParameter("@description", description)
-                };
-                newAppId=dbhelper.InsertAndGetId(sc, sqlParameters);
-                Response.Write("Record into databaset Finished.");
-                Response.Flush();
-              
-                //step3:create appSettings.json for add connecting to the database
-
-                if (cloudRepoIds.Contains(Convert.ToInt32(repo)))
-                {
-                    CreateOrEditAppSettingsJsonFile(directoryPath, Convert.ToInt32(db));
-                    CreateOrEditEcomConfigFile(directoryPath, newAppId);
-
-                }
-              
-            }
+            info = "The directory does not exist.";
+            return;
         }
-        else{
-            //repo<0 means one empty app
-           string sc = "INSERT into web_app (name,location,db_id,repo_id,creator,description) VALUES(@name,'',@db_id,@repo_id,@creator,@description) ";
-            SqlParameter[] sqlParameters =
-            {
-                    new SqlParameter("@name",name),
-                    new SqlParameter("@db_id",db),
-                    new SqlParameter("@repo_id",repo),
-                    new SqlParameter("@creator",(int)Session["user_id"]),
-                    new SqlParameter("@description", description)
-                };
-           newAppId= dbhelper.InsertAndGetId(sc, sqlParameters);
+        if (!File.Exists(appSettingsPath))
+        {
+            info = "appSettings.json can not be found. Please make sure this is a RST374cloud application.";
+            return;
         }
-
+        int count = (int)dbhelper.ExecuteScalar("SELECT COUNT(*) FROM web_app where location='" + location+"'");
+        if (count >0)
+        {
+            info = "This directory is occupied.";
+            return;
+        }
+        string sc = "INSERT into web_app (name,location,db_id,repo_id,creator,description,dev) VALUES(@name,@location,@db_id,@repo_id,@creator,@description,1) ";
+        SqlParameter[] sqlParameters =
+        {
+                new SqlParameter("@name",name),
+                new SqlParameter("@db_id",db),
+                new SqlParameter("@repo_id",repo),
+                new SqlParameter("@location",location),
+                new SqlParameter("@creator",(int)Session["user_id"]),
+                new SqlParameter("@description", description)
+            };
+        int newAppId = dbhelper.InsertAndGetId(sc, sqlParameters);
+        CreateOrEditAppSettingsJsonFile(location, Convert.ToInt32(db));
+        CreateOrEditEcomConfigFile(location, newAppId);
         string createMreport = Request.Form["createMreport"];
         if (createMreport == "1")
         {
@@ -491,8 +387,8 @@ public partial class app_list : AdminBasePage
                     System.IO.File.Copy(s, destFile, true);
                 }
             }
-            string sc = "INSERT INTO mreport (name,description,url,location,app_id) values(@name,@description,@url,@location,@app_id)";
-            SqlParameter[] sqlParameters =
+             sc = "INSERT INTO mreport (name,description,url,location,app_id) values(@name,@description,@url,@location,@app_id)";
+            SqlParameter[] parameters =
             {
                 new SqlParameter("@app_id",newAppId),
                 new SqlParameter("@name",mreportName ),
@@ -503,7 +399,7 @@ public partial class app_list : AdminBasePage
 
             try
             {
-                dbhelper.ExecuteNonQuery(sc, sqlParameters);
+                dbhelper.ExecuteNonQuery(sc, parameters);
                 CreateOrEditConfigFile(targetPath, newAppId);
                 // set mreport menu in cloud
                 int db_id = (int)dbhelper.ExecuteScalar("SELECT db_id from web_app where id=" + newAppId);
@@ -528,26 +424,14 @@ public partial class app_list : AdminBasePage
 
     public void LoadAppList()
     {
-        string repo = Request.QueryString["repo"];
-        string sc = "";
-        if (string.IsNullOrEmpty(repo))
-        {
-            sc = @"SELECT wa.*,db.conn_str,db.name as 'db_name',gr.name as 'repo_name',mp.url as 'mreport_url' from web_app wa 
-                left join db_list db on wa.db_id=db.id 
-                left join git_repository gr on wa.repo_id=gr.id 
-                left join mreport mp on mp.app_id=wa.id
-                where wa.dev=0 
-                order by repo_id,id desc";
 
-        }
-        else{
-            sc = @"SELECT wa.*,db.conn_str,db.name as 'db_name',gr.name as 'repo_name',mp.url as 'mreport_url' from web_app wa 
-                left join db_list db on wa.db_id=db.id 
-                left join git_repository gr on wa.repo_id=gr.id 
-                left join mreport mp on mp.app_id=wa.id
-                where wa.dev=0 and wa.repo_id=" + repo;
-        }
-      
+        string sc = "";
+        sc = @"SELECT wa.*,db.conn_str,db.name as 'db_name',gr.name as 'repo_name',mp.url as 'mreport_url' from web_app wa 
+            left join db_list db on wa.db_id=db.id 
+            left join git_repository gr on wa.repo_id=gr.id 
+            left join mreport mp on mp.app_id=wa.id
+            where wa.dev=1 
+            order by repo_id,id desc";
         appDataTable = dbhelper.ExecuteDataTable(sc);
 
 
