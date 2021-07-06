@@ -206,7 +206,7 @@
                     <div class="modal-body" id="DeleteModalBody">
                         <input type="hidden" class="form-control  col-sm-8" name='id' />
                           <input type="hidden" class="form-control  col-sm-8" name='deleteDb' value="1" />
-                        <h5 > Are you sure to delete this dev database?</h5>
+                        <h5 > Are you sure to drop this dev database?</h5>
                         <div class="form-group row">
                             <label for="recipient-name" class="col-form-label col-sm-4">Password:</label>
                             <input type="password" class="form-control  col-sm-8" name='password'>

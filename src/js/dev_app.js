@@ -39,7 +39,7 @@ $(document).on("click", ".delete-btn", function (e) {
     }
    
     $("#DeleteForm input[name=id]").val(id);
-    $("#deletePrompt").html("Are you sure to delete [" + $(this).data("name")+"]")
+    $("#deletePrompt").html("Are you sure to delete [" + $(this).data("name")+"]? The directory would not be deleted.")
     $("#deleteFileLocation").html(" [" + $(this).data("location") + "]")
 })
 
