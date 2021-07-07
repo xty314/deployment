@@ -584,7 +584,7 @@ public partial class app_list : AdminBasePage
         sb.Append(@"<label class='col-form-label col-sm-4'>Database</label>");
         sb.Append("<select class='form-control col-sm-8' name='db'>");
 
-        string sc = "SELECT * FROM db_list order by id desc";
+        string sc = "SELECT * FROM db_list where dev=0 order by id desc";// 不显示dev数据库
         DataTable dt = dbhelper.ExecuteDataTable(sc);
         foreach (DataRow dr in dt.Rows)
         {

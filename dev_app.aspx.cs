@@ -426,7 +426,7 @@ public partial class app_list : AdminBasePage
     {
 
         string sc = "";
-        sc = @"SELECT wa.*,db.conn_str,db.name as 'db_name',gr.name as 'repo_name',mp.url as 'mreport_url' from web_app wa 
+        sc = @"SELECT wa.*,db.conn_str,db.name as 'db_name',gr.name as 'repo_name',mp.url as 'mreport_url',db.dev as 'db_dev' from web_app wa 
             left join db_list db on wa.db_id=db.id 
             left join git_repository gr on wa.repo_id=gr.id 
             left join mreport mp on mp.app_id=wa.id
@@ -468,7 +468,7 @@ public partial class app_list : AdminBasePage
         sb.Append(@"<label class='col-form-label col-sm-4'>Database</label>");
         sb.Append("<select class='form-control col-sm-8' name='db'>");
 
-        string sc = "SELECT * FROM db_list order by id desc";
+        string sc = "SELECT * FROM db_list order by dev desc,id desc";
         DataTable dt = dbhelper.ExecuteDataTable(sc);
         foreach (DataRow dr in dt.Rows)
         {

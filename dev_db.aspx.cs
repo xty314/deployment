@@ -174,6 +174,15 @@ public partial class database : AdminBasePage
        
     }
 
-    
+    public string ActiveRow(string id)
+    {
+        string result = "";
+
+        if (id == Request.QueryString["id"])
+        {
+            result = "active-tr";
+        }
+        return result;
+    }
 
 }

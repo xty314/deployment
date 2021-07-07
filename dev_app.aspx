@@ -81,7 +81,7 @@
                     <tbody>
                         <%foreach (DataRow dr in appDataTable.Rows)
                             {%>
-                        <tr>
+                        <tr >
                             <td>#<%=dr["id"]%>
                             </td>
                             <td>
@@ -96,7 +96,16 @@
                             </td>
                 
                             <td>
-                               <a href="database.aspx?id=<%=dr["db_id"] %>"><%=dr["db_name"] %></a> <br />
+                                <%if ((bool)dr["db_dev"])
+                                    { %>
+                               <a href="dev_db.aspx?id=<%=dr["db_id"] %>"><%=dr["db_name"] %></a> 
+                                <%}
+                                else
+                                { %>
+                                <a href="database.aspx?id=<%=dr["db_id"] %>"><%=dr["db_name"] %></a> 
+
+                                <%} %>
+                                <br />
                                  <small><%=Common.GetServer(dr["conn_str"].ToString()) %></small>
                             </td>
                             <td> 
@@ -393,7 +402,7 @@
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" name='cmd' value="delete" class="btn btn-primary" id="DeleteModalBtn">Delete</button>
+                        <button type="submit" name='cmd' value="delete" class="btn btn-primary once-click-btn" id="DeleteModalBtn">Delete</button>
                     </div>
                 </div>
             </div>

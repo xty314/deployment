@@ -74,7 +74,7 @@
                     <tbody>
                         <%foreach (DataRow dr in dbDataTable.Rows)
                             {%>
-                        <tr >
+                        <tr class="<%=ActiveRow(dr["id"].ToString())%>">
                             <%if (!string.IsNullOrEmpty(Request.QueryString["origin"]) && Request.QueryString["origin"] != "0")
                                 {%>
                             <td>
@@ -237,7 +237,7 @@
                     </div>
                     <div class="modal-body">
                         <input type="hidden" class="form-control  col-sm-8" name='id' />
-                        <input type="hidden" class="form-control  col-sm-8" name='url' value="database.aspx" />
+                        <input type="hidden" class="form-control  col-sm-8" name='url' value="dev_app.aspx" />
          
                         <div class="form-group row">
                             <label for="editDatabase" class="col-form-label col-sm-4" id="scriptLabel">Script:</label>

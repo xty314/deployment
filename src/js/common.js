@@ -1,9 +1,11 @@
 ﻿
 
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-    })
-
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+$(document).on("click", ".once-click-btn", function () {
+    this.disabled = true;
+})
      
 
 function GetHtml($dom) {

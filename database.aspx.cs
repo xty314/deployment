@@ -39,6 +39,7 @@ public partial class database : AdminBasePage
             CopyDatabase();
         }
         LoadDatabaseList();
+ 
     }
 
     private void CopyDatabase()
@@ -54,16 +55,16 @@ public partial class database : AdminBasePage
             string masterDbConnection = "Server=" + server + ";Database=master;User Id=eznz;password=9seqxtf7";
             DBhelper masterHelper = new DBhelper(masterDbConnection);
             string bakName = database + "_" + currentTime.ToString("yyyyMMddHHmmss") + ".bak";
-            backupPath = Path.Combine(backupPath, bakName);
-            //step1 back origin db
+            backupPath = Path.Combine(backupPath, bakName);  //还原bak的文件地址路径
+            //step1 备份bak文件
             string sc = String.Format("Backup Database [{0}] To disk = '{1}' WITH INIT", database, backupPath);
             masterHelper.ExecuteNonQuery(sc);
-            //step2 create a new db
-            string copyDbName = database + currentTime.ToString("yyyyMMddHHmmss");
+            //step2 创建一个空数据库
+            string copyDbName = "dev_"+database + currentTime.ToString("yyyyMMddHHmmss");
             dbhelper.CreadDatabase(masterDbConnection, copyDbName);
-            //还原bak的文件地址路径
+       
             //!!!!bak文件需要在数据库的服务器上，地址也为数据库上bak的路径不是aspx程序的服务器
-            //step3 restore db with the new bak
+            //step3 还原数据库
             sc = String.Format("RESTORE DATABASE {0} FROM DISK = '{1}' WITH REPLACE", copyDbName, backupPath);
             masterHelper.ExecuteNonQuery(sc);
 
@@ -71,6 +72,8 @@ public partial class database : AdminBasePage
             sc = @"INSERT INTO db_list (name,conn_str,creator,install_db_id,dev) VALUES
                     (@name,@conn_str,@creator,0,1)";
             string newDbConnection = "Server=" + server + ";Database=" + copyDbName + ";User Id=eznz;password=9seqxtf7";
+
+
             SqlParameter[] parameters =
             {
                new SqlParameter("@name", copyDbName),
@@ -78,7 +81,12 @@ public partial class database : AdminBasePage
                new SqlParameter("@creator", creator),         
             };
             dbhelper.ExecuteNonQuery(sc, parameters);
+
             info =string.Format("Copy database successfully, new dev database {0} in the server {1}", copyDbName,server);
+            //step4 删除生成的临时bak文件
+            DeleteBakFileFromDBServer(server, backupPath);
+         
+           
         }
         catch (Exception e)
         {
@@ -87,7 +95,41 @@ public partial class database : AdminBasePage
         }
         
     }
+    private void DeleteBakFileFromDBServer(string server,string bakFilePath)
+    {
+        //判断传入路径是文件而不是文件夹
+        Regex reg = new Regex(@"^(?<fpath>([a-zA-Z]:\\)([\s\.\-\w]+\\)*)(?<fname>[\w]+.bak)$");    
+        Match result = reg.Match(bakFilePath);
+        if (!result.Success)
+        {
+            info = "This Path is not a file.";
+            return;
+        }
+        string masterDbConnection = "Server=" + server + ";Database=master;User Id=eznz;password=9seqxtf7";
+        DBhelper masterHelper = new DBhelper(masterDbConnection); 
+        try
+        {
+            string sc = "";
+            sc += " RECONFIGURE "; //先执行一次刷新，处理上次的配置
+             sc += " EXEC sp_configure 'show advanced options',1 "; //启用xp_cmdshell的高级配置
+            sc += " RECONFIGURE";     //刷新配置
+            sc += " EXEC sp_configure 'xp_cmdshell',1 ";//打开xp_cmdshell,可以调用SQL系统之外的命令
+            sc += " RECONFIGURE "; //刷新配置
+            sc += " EXEC master.dbo.xp_cmdshell 'del "+ bakFilePath + "',no_output "; //使用xp_cmdshell删除bak文件,[no_output]表示是否输出信息     
+            sc += " EXEC sp_configure 'show advanced options','1' ";//确保show advances options 的值为1,这样才可以执行xp_cmdshell为0的操作 
+            sc += " RECONFIGURE ";//刷新配置
+            sc += " EXEC sp_configure 'xp_cmdshell',0"; //关闭xp_cmdshell 
+            sc += " RECONFIGURE";//刷新配置
+            sc += " EXEC sp_configure 'show advanced options','0' ";//关闭show advanced options
+            SqlParameter sqlParameter = new SqlParameter("@bakPath", bakFilePath);
+            masterHelper.ExecuteNonQuery(sc);
+        }
+        catch(Exception e)
+        {
+            info = e.Message;
+        }
 
+    }
     private void DeleteDatabase()
     {
 

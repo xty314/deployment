@@ -416,8 +416,8 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" name='cmd' value="delete" class="btn btn-primary" id="DeleteModalBtn">Delete</button>
+                        <button type="button" class="btn btn-secondary " data-dismiss="modal">Close</button>
+                        <button type="submit" name='cmd' value="delete" class="btn btn-primary once-click-btn" id="DeleteModalBtn">Delete</button>
                     </div>
                 </div>
             </div>

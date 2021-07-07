@@ -33,7 +33,7 @@ public partial class execute : AdminBasePage
     {
         string[] dbIds = Request.Form.GetValues("id");
         string[] scriptIds = Request.Form.GetValues("scripts");
-        string install_db = Request.Form["install_db"];
+        string install_db = Request.Form["install_db"];//if update the install db in the meantime
         if (dbIds==null)
         {
             Response.Write("<h1>No database selected, please try again.</h1>");
