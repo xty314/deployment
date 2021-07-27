@@ -70,8 +70,11 @@ public partial class database : AdminBasePage
                 // delete database
                 if (deleteDb == "1")
                 {
-                    sc = "alter database " + database + " set single_user with rollback immediate ";
+                    sc = " if exists(select * from sys.databases where name = '" + database + "') ";
+                    sc += " BEGIN ";
+                    sc += "alter database " + database + " set single_user with rollback immediate ";
                     sc += " DROP DATABASE " + database;
+                    sc += " END ";
                     dbhelper.ExecuteNonQuery(sc);
                 }
             }
