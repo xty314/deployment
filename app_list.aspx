@@ -59,23 +59,23 @@
                      >
                     <thead>
                         <tr>
-                            <th data-field="id" data-sortable="true" style="width: 1%">#id
+                            <th data-field="id" data-sortable="true" data-width="1" data-width-unit="%">#id
                             </th>
-                            <th data-field="name" data-sortable="true"  style="width: 4%">App Name
+                            <th data-field="name" data-sortable="true"  data-width="2" data-width-unit="%">App Name
                             </th>
 
-                            <th style="width: 10%">Description
+                            <th data-width="20" data-width-unit="%">Description
                             </th>
                          
-                            <th style="width: 10%">Database
+                            <th data-width="10" data-width-unit="%">Database
                             </th>
-                            <th style="width: 30%">URL
+                            <th data-width="20" data-width-unit="%">URL
                             </th>
-                                 <th style="width: 10%">IIS State
+                                 <th data-width="8" data-width-unit="%">IIS State
                             </th>
-                            <th   data-field="last_update_date" data-sortable="true"  style="width: 15%">Last Update Date
+                            <th   data-field="last_update_date" data-sortable="true"   data-width="10" data-width-unit="%">Last Update Date
                             </th>
-                            <th style="width: 40%" class="text-right">Action
+                            <th  data-width="30" data-width-unit="%" class="text-right">Action
                             </th>
                         </tr>
                     </thead>
@@ -87,7 +87,7 @@
                             </td>
                             <td>
 
-                                   <a href="http://<%=dr["url"] %>" target="_blank">
+                                   <a href='http://<%=dr["url"] %>' target="_blank">
                                 <%=dr["name"] %></a><br />
                                 <small><%=dr["location"] %></small>
 
@@ -97,13 +97,13 @@
                             </td>
                 
                             <td>
-                               <a href="database.aspx?id=<%=dr["db_id"] %>"><%=dr["db_name"] %></a> <br />
+                               <a href='database.aspx?id=<%=dr["db_id"] %>'><%=dr["db_name"] %></a> <br />
                                  <small><%=Common.GetServer(dr["conn_str"].ToString()) %></small>
                             </td>
                             <td> 
                                 <%if ((bool)dr["deploy"])
                                      { %>
-                               <small>Cloud URL: <a href="http://<%=dr["url"] %>">http://<%=dr["url"] %></a>
+                               <small>Cloud URL: <a href='http://<%=dr["url"] %>'>http://<%=dr["url"] %></a>
                                     <button type="button" class="btn btn-default btn-sm copy-btn"><i class="far fa-copy"></i> Copy</button>
                                </small><br />
                                 <%} %>
@@ -112,7 +112,7 @@
                                </small><br />
                                    <%if (!string.IsNullOrEmpty(dr["mreport_url"].ToString()))
                                      { %>
-                               <small>Mreport: <a href="<%=dr["mreport_url"] %>" target="_blank"><%=dr["mreport_url"] %></a>
+                               <small>Mreport: <a href='<%=dr["mreport_url"] %>' target="_blank"><%=dr["mreport_url"] %></a>
                                     <button type="button" class="btn btn-default btn-sm copy-btn"><i class="far fa-copy"></i> Copy</button>
                                </small><br />
                                 <%} %>
@@ -145,9 +145,9 @@
                                     Action
                                 </button>
                                 <div class="dropdown-menu" role="menu">
-                                    <a class="dropdown-item" href="./app_user.aspx?id=<%=dr["id"]%>"><i class="fas fa-user"></i>USER</a>
+                                    <a class="dropdown-item" href='./app_user.aspx?id=<%=dr["id"]%>'><i class="fas fa-user"></i>USER</a>
                                     <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" href="./app_branch.aspx?id=<%=dr["id"]%>"><i class="fas fa-building"></i>BRANCH</a>
+                                        <a class="dropdown-item" href='./app_branch.aspx?id=<%=dr["id"]%>'><i class="fas fa-building"></i>BRANCH</a>
                                     </div>
                                 </div>
 
@@ -159,7 +159,7 @@
                                     <i class="fas fa-plus-circle"></i>
                                     Update
                                 </a>
-                                <a class="btn btn-danger btn-sm edit-btn ml-1 mb-1" href="?check=<%=dr["id"] %>">
+                                <a class="btn btn-danger btn-sm edit-btn ml-1 mb-1" href='?check=<%=dr["id"] %>'>
                                     <i class="fas fa-history"></i>
                                     Modify Check
                                 </a>
@@ -168,7 +168,7 @@
                                     { %>
                                 <a class="btn btn-primary btn-sm deploy-btn ml-1 mb-1"
                                     data-toggle="modal" data-target="#DeployModal"
-                                    data-id="<%=dr["id"] %>">
+                                    data-id='<%=dr["id"] %>'>
                                     <i class="fas fa-upload"></i>
                                     Deploy
                                 </a><%}
@@ -184,10 +184,10 @@
                                 <a class="btn btn-info btn-sm edit-btn ml-1 mb-1" href="#"
                                     data-toggle="modal" data-target="#EditModal"
                                     data-id='<%=dr["id"]%>'
-                                    data-name="<%=dr["name"] %>"
-                                      data-description="<%=dr["description"] %>"
-                                      data-db="<%=dr["db_id"] %>"
-                                     data-removable="<%=dr["removable"] %>"
+                                    data-name='<%=dr["name"] %>'
+                                      data-description='<%=dr["description"] %>'
+                                      data-db='<%=dr["db_id"] %>'
+                                     data-removable='<%=dr["removable"] %>'
                                     >
                                     <i class="fas fa-pencil-alt"></i>
                                     EDIT
@@ -232,7 +232,7 @@
                     <div class="modal-body">
                          <div class="form-group row">
                             <label for="recipient-name" class="col-form-label col-sm-4">Directory:</label>
-                            <input type="text" class="form-control  col-sm-8" name='location' value="<%=Common.GetSetting("app_install_location") %>">
+                            <input type="text" class="form-control  col-sm-8" name='location' value='<%=Common.GetSetting("app_install_location") %>'>
                         </div>
                         <div class="form-group row">
                             <label for="recipient-name" class="col-form-label col-sm-4">Name:</label>
@@ -417,7 +417,7 @@
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary " data-dismiss="modal">Close</button>
-                        <button type="submit" name='cmd' value="delete" class="btn btn-primary once-click-btn" id="DeleteModalBtn">Delete</button>
+                        <button type="submit" name='cmd' value="delete" class="btn btn-primary" id="DeleteModalBtn">Delete</button>
                     </div>
                 </div>
             </div>

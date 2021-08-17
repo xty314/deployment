@@ -32,6 +32,7 @@ $(document).on("click", ".delete-btn", function (e) {
 
     var id = $(this).data("id");
     var repo = $(this).data("repo");
+
     if (repo > 0) {
         $("#deleteCheck").attr("disabled", false);
     } else {
