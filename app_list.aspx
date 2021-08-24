@@ -244,14 +244,14 @@
                             <label class="col-form-label col-sm-4">Description</label>
                             <textarea class="form-control col-sm-8" rows="3" name="description" placeholder="Description ..." style="margin-top: 0px; margin-bottom: 0px; height: 105px;"></textarea>
                         </div>
-                        <div class="form-group row private_info">
+                    <%--    <div class="form-group row private_info">
                             <label for="recipient-name" class="col-form-label col-sm-4">Git User Name:</label>
                             <input type="text" class="form-control  col-sm-8" name='gitname'>
                         </div>
                         <div class="form-group row private_info">
                             <label for="recipient-name" class="col-form-label col-sm-4">Git Password:</label>
                             <input type="password" class="form-control  col-sm-8" name='gitpass' />
-                        </div>
+                        </div>--%>
                        <div class="form-group row"">
                              <label class="col-form-label col-sm-4" for="newMeportCheck">Create Mreport:</label>
                             <input type="checkbox" class="form-control form-control-sm col-sm-1" name="createMreport" id="newMeportCheck" value=1>
@@ -436,14 +436,14 @@
                     </div>
                     <div class="modal-body">
                        <input type="hidden" class="form-control  col-sm-8" name='id' />
-                        <div class="form-group row private_info">
+                   <%--     <div class="form-group row private_info">
                             <label for="recipient-name" class="col-form-label col-sm-4">Git User Name:</label>
                             <input type="text" class="form-control  col-sm-8" name='gitname'>
                         </div>
                         <div class="form-group row private_info">
                             <label for="recipient-name" class="col-form-label col-sm-4">Git Password:</label>
                             <input type="password" class="form-control  col-sm-8" name='gitpass' />
-                        </div>
+                        </div>--%>
                
                     </div>
                     <div class="modal-footer">

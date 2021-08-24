@@ -20,6 +20,8 @@ public partial class app_list : AdminBasePage
     public DataTable appDataTable = new DataTable();
     public string info = "";
     public int[] cloudRepoIds = { 1 };//属于cloud的仓库，需要建立appSettings.json和ecom/config.js
+    public string githubUsername = "xty314";
+    public string githubToken = "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";
     protected void Page_Load(object sender, EventArgs e)
     {
         string checkId = Request.QueryString["check"];
@@ -147,8 +149,8 @@ public partial class app_list : AdminBasePage
     private void PullFromGithub()
     {
         string id = Request.Form["id"].ToString().Trim();
-        string userName = Request.Form["gitname"].ToString().Trim();
-        string password = Request.Form["gitpass"].ToString().Trim();
+        //string userName = Request.Form["gitname"].ToString().Trim();
+        //string password = Request.Form["gitpass"].ToString().Trim();
         string path = (string)dbhelper.ExecuteScalar("SELECT location from web_app where id=" + id);
         path = Path.GetFullPath(path);
         try
@@ -162,13 +164,15 @@ public partial class app_list : AdminBasePage
                     (url, usernameFromUrl, types) =>
                         new UsernamePasswordCredentials()
                         {
-                            Username = userName,
-                            Password = password
+                            //Username = username,
+                            //Password = password
+                            Username = githubUsername,
+                            Password = githubToken
                         });
 
                 // User information to create a merge commit
                 var signature = new LibGit2Sharp.Signature(
-                    new Identity(userName, "support@eznz.com"), DateTimeOffset.Now);
+                    new Identity(githubUsername, "support@eznz.com"), DateTimeOffset.Now);
 
                 // Pull
                 MergeResult result = Commands.Pull(repo, signature, options);
@@ -359,8 +363,8 @@ public partial class app_list : AdminBasePage
         string name = Request.Form["name"].Trim();
         string repo = Request.Form["repo"].Trim();
         string description = Request.Form["description"].Trim();
-        string username = Request.Form["gitname"].Trim();
-        string password = Request.Form["gitpass"].Trim();
+        //string username = Request.Form["gitname"].Trim();
+        //string password = Request.Form["gitpass"].Trim();
         string db= Request.Form["db"].Trim();
         int newAppId=0;
         string location = Path.GetFullPath(Request.Form["location"].ToString().Trim());
@@ -401,15 +405,23 @@ public partial class app_list : AdminBasePage
                     }
                     else
                     {
+
+                    //remote: Support for password authentication was removed on August 13, 2021.
+                    //Please use a personal access token instead.
+                    //remote: Please see https://github.blog/2020-12-15-token-authentication-requirements-for-git-operations/ 
+                     //for more information.
+
                         CloneOptions options = new CloneOptions
                         {
                             CredentialsProvider = (_url, _user, _cred) => new UsernamePasswordCredentials
                             {
-                                Username = username,
-                                Password = password
+                                //Username = username,
+                                //Password = password
+                                Username = githubUsername,
+                                Password = githubToken
                             },
                         };
-
+                      
                         //private git repo need user name and password
                         Repository.Clone(dr["url"].ToString(), directoryPath, options);//x64
                     }
